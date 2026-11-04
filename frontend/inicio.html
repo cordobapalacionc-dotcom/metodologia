@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Inicio · Quibdó Conecta</title>
+  <meta name="theme-color" content="#0f5132">
+  <link rel="manifest" href="/manifest.webmanifest">
+  <link rel="icon" href="/img/logo.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="/css/base.css">
+  <link rel="stylesheet" href="/css/inicio.css">
+  <script type="module" src="/js/inicio.js"></script>
+</head>
+<body data-pagina="inicio">
+  <a class="saltar" href="#contenido">Saltar al contenido</a>
+  <header id="cabecera" class="cabecera"></header>
+
+  <main id="contenido">
+    <section class="inicio-hero">
+      <div>
+        <h2 id="saludo">Bienvenido a Quibdó Conecta</h2>
+        <p class="intro">Una plataforma liviana pensada para estudiantes, adultos, docentes y emprendedores de Quibdó y el Chocó. Funciona en celulares sencillos y la mayor parte del contenido se puede usar <b>sin conexión</b> una vez abierto.</p>
+        <a class="btn" href="/diagnostico">Haz tu diagnóstico digital <svg class="ico" aria-hidden="true"><use href="/img/iconos.svg#i-der"/></svg></a>
+      </div>
+      <div class="card tarjeta-progreso" id="tarjetaProgreso">
+        <h3><svg class="ico" aria-hidden="true"><use href="/img/iconos.svg#i-check"/></svg> Tu progreso</h3>
+        <p id="resumenProgreso">Cargando…</p>
+        <div class="barra"><span id="barraGlobal" style="width:0"></span></div>
+        <p style="font-size:.88rem;margin:0 0 10px" id="resumenDiag"></p>
+        <a class="ir" href="/perfil">Ver todo en Mi panel <svg class="ico" aria-hidden="true"><use href="/img/iconos.svg#i-der"/></svg></a>
+      </div>
+    </section>
+
+    <section id="misCertificados" class="mis-certificados" hidden>
+      <h3><svg class="ico" aria-hidden="true"><use href="/img/iconos.svg#i-birrete"/></svg> Mis certificados</h3>
+      <div class="grid" id="listaCertificados"></div>
+    </section>
+
+    <div class="grid accesos">
+      <a class="card" href="/aula">
+        <div class="ico-caja"><svg class="ico ico-grande" aria-hidden="true"><use href="/img/iconos.svg#i-libro"/></svg></div>
+        <h3>Aula virtual</h3><p>Informática básica, Word, Excel, correo y uso seguro de Internet.</p>
+        <span class="ir">Ir a los cursos <svg class="ico" aria-hidden="true"><use href="/img/iconos.svg#i-der"/></svg></span></a>
+      <a class="card" href="/conectividad">
+        <div class="ico-caja rio"><svg class="ico ico-grande" aria-hidden="true"><use href="/img/iconos.svg#i-wifi"/></svg></div>
+        <h3>Mapa de conectividad</h3><p>Zonas con baja señal y puntos de Wi-Fi gratuito o comunitario.</p>
+        <span class="ir">Ver el mapa <svg class="ico" aria-hidden="true"><use href="/img/iconos.svg#i-der"/></svg></span></a>
+      <a class="card" href="/recursos">
+        <div class="ico-caja tierra"><svg class="ico ico-grande" aria-hidden="true"><use href="/img/iconos.svg#i-carpeta"/></svg></div>
+        <h3>Banco de recursos</h3><p>Guías descargables para estudiar después sin Internet.</p>
+        <span class="ir">Ver recursos <svg class="ico" aria-hidden="true"><use href="/img/iconos.svg#i-der"/></svg></span></a>
+      <a class="card" href="/oportunidades">
+        <div class="ico-caja oro"><svg class="ico ico-grande" aria-hidden="true"><use href="/img/iconos.svg#i-birrete"/></svg></div>
+        <h3>Oportunidades</h3><p>Becas, cursos gratuitos, empleo, convocatorias y emprendimiento.</p>
+        <span class="ir">Ver oportunidades <svg class="ico" aria-hidden="true"><use href="/img/iconos.svg#i-der"/></svg></span></a>
+      <a class="card" href="/diagnostico">
+        <div class="ico-caja"><svg class="ico ico-grande" aria-hidden="true"><use href="/img/iconos.svg#i-grafica"/></svg></div>
+        <h3>Diagnóstico digital</h3><p>Cuéntanos tu situación y recibe una ruta de aprendizaje.</p>
+        <span class="ir">Hacer diagnóstico <svg class="ico" aria-hidden="true"><use href="/img/iconos.svg#i-der"/></svg></span></a>
+    </div>
+  </main>
+
+  <footer>Quibdó Conecta · Plataforma de inclusión digital para Quibdó y el Chocó</footer>
+</body>
+</html>

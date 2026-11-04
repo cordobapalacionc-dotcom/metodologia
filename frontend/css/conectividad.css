@@ -1,0 +1,33 @@
+/* =========================================================
+   Mapa de conectividad (Leaflet + OpenStreetMap)
+   ========================================================= */
+.barra-mapa{display:flex;flex-wrap:wrap;gap:10px;justify-content:space-between;align-items:flex-start}
+.punto-ley{display:inline-block;width:10px;height:10px;border-radius:50%}
+.mapa-wrap{display:grid;gap:16px;grid-template-columns:1.6fr 1fr;align-items:start}
+.mapa-caja{position:relative}
+.mapa{height:480px;border-radius:var(--radio);border:1px solid var(--borde);background:#e8eee6;z-index:1}
+.mapa.ubicando{cursor:crosshair;outline:3px dashed var(--oro);outline-offset:3px}
+.mapa.ubicando .leaflet-interactive{cursor:crosshair}
+.indicacion-mapa{position:absolute;top:12px;left:50%;transform:translateX(-50%);background:var(--oro);color:var(--selva);font-weight:600;font-size:.85rem;padding:6px 14px;border-radius:99px;box-shadow:var(--sombra);z-index:500}
+.mapa-error{position:absolute;inset:0;display:grid;place-items:center;text-align:center;padding:20px;color:var(--suave);background:#eef2ec;border-radius:var(--radio);margin:0;z-index:600}
+.panel-lateral{display:grid;gap:14px}
+
+/* Marcador "mi ubicación" */
+.yo{width:18px;height:18px;border-radius:50%;background:#1d4ed8;border:3px solid #fff;box-shadow:0 0 0 6px rgba(29,78,216,.25)}
+.leaflet-tooltip{font:600 .8rem system-ui,sans-serif}
+
+/* Lista accesible de puntos */
+.lista-puntos{margin-top:22px}
+.lista-puntos h3{display:flex;align-items:baseline;gap:8px}
+.lista-puntos small{color:var(--suave);font-weight:400}
+.lista-puntos ul{list-style:none;padding:0;margin:0;display:grid;gap:8px;grid-template-columns:repeat(auto-fill,minmax(280px,1fr))}
+.lista-puntos button{width:100%;text-align:left;display:flex;gap:10px;align-items:center;background:#fff;border:1px solid var(--borde);border-radius:12px;padding:10px 12px;font:inherit;cursor:pointer;color:var(--texto)}
+.lista-puntos button:hover{border-color:var(--selva-2)}
+.lista-puntos .nombre{flex:1;font-weight:600;font-size:.92rem}
+.lista-puntos .nombre small{display:block;font-weight:400;color:var(--suave)}
+.lista-puntos .dist{font-size:.8rem;color:var(--rio);font-weight:700;white-space:nowrap}
+
+@media (max-width:760px){
+  .mapa-wrap{grid-template-columns:1fr}
+  .mapa{height:380px}
+}

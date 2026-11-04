@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Certificado · Quibdó Conecta</title>
+  <meta name="theme-color" content="#0f5132">
+  <link rel="icon" href="/img/logo.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="/css/base.css">
+  <link rel="stylesheet" href="/css/certificado.css">
+  <script type="module" src="/js/certificado.js"></script>
+</head>
+<body>
+  <div class="barra-cert no-imprimir">
+    <a class="btn fantasma" href="/inicio"><svg class="ico" aria-hidden="true"><use href="/img/iconos.svg#i-izq"/></svg> Volver</a>
+    <div class="acciones">
+      <button class="btn" id="btnImprimir" hidden><svg class="ico" aria-hidden="true"><use href="/img/iconos.svg#i-descargar"/></svg> Descargar PDF / Imprimir</button>
+      <button class="btn sec" id="btnCopiar" hidden><svg class="ico" aria-hidden="true"><use href="/img/iconos.svg#i-externo"/></svg> Copiar enlace</button>
+    </div>
+  </div>
+
+  <main id="contenido">
+    <!-- Verificación por código -->
+    <section class="card verificar no-imprimir" id="verificar" hidden>
+      <h2><svg class="ico" aria-hidden="true"><use href="/img/iconos.svg#i-escudo"/></svg> Verificar un certificado</h2>
+      <p class="intro">Escribe el código que aparece en el certificado (por ejemplo QC-ABCDE-FGHJK).</p>
+      <form id="formVerificar" class="acciones">
+        <input type="text" id="codigo" placeholder="QC-XXXXX-XXXXX" maxlength="20" required style="max-width:260px;text-transform:uppercase">
+        <button class="btn" type="submit">Verificar</button>
+      </form>
+      <p class="msg-error" id="errVerificar" role="alert"></p>
+    </section>
+
+    <!-- Certificado -->
+    <article class="certificado" id="certificado" hidden>
+      <div class="cert-borde">
+        <header class="cert-cabecera">
+          <img src="/img/logo.svg" alt="" width="64" height="64">
+          <div>
+            <b>Quibdó Conecta</b>
+            <span>Plataforma de inclusión digital · Quibdó, Chocó</span>
+          </div>
+        </header>
+
+        <p class="cert-tipo">Certificado de participación</p>
+        <p class="cert-texto">Se otorga a</p>
+        <h1 class="cert-nombre" id="certNombre"></h1>
+        <p class="cert-texto">por haber completado satisfactoriamente el curso</p>
+        <h2 class="cert-curso" id="certCurso"></h2>
+        <p class="cert-texto" id="certDetalle"></p>
+
+        <footer class="cert-pie">
+          <div>
+            <span class="cert-linea"></span>
+            <small>Quibdó Conecta</small>
+          </div>
+          <div class="cert-codigo">
+            <small>Código de verificación</small>
+            <b id="certCodigo"></b>
+            <small id="certUrl"></small>
+          </div>
+        </footer>
+        <p class="cert-nota">Certificado de participación en formación libre. No equivale a un título académico oficial.</p>
+      </div>
+    </article>
+  </main>
+</body>
+</html>

@@ -1,0 +1,20 @@
+{
+  "name": "quibdo-conecta-backend",
+  "version": "1.0.0",
+  "description": "API y servidor de Quibdó Conecta: plataforma de inclusión digital para Quibdó",
+  "private": true,
+  "type": "module",
+  "main": "src/server.js",
+  "scripts": {
+    "start": "node src/server.js",
+    "dev": "node --watch src/server.js",
+    "admin": "node scripts/crear-admin.js"
+  },
+  "engines": {
+    "node": ">=22.13"
+  },
+  "dependencies": {
+    "express": "^5.1.0",
+    "leaflet": "^1.9.4"
+  }
+}

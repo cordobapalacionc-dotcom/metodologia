@@ -1,0 +1,14 @@
+# Dependencias
+node_modules/
+
+# Base de datos local (contiene usuarios y contraseñas cifradas)
+backend/datos/
+*.db
+*.db-shm
+*.db-wal
+
+# Sistema / editor
+.DS_Store
+Thumbs.db
+.vscode/
+*.log

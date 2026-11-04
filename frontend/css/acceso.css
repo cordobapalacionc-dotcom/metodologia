@@ -1,0 +1,39 @@
+/* =========================================================
+   Página de acceso: iniciar sesión / registrarse
+   ========================================================= */
+.auth{min-height:100vh;display:grid;grid-template-columns:1fr 1fr}
+.auth-lado{background:linear-gradient(150deg,var(--selva),var(--rio));color:#fff;padding:48px;display:flex;flex-direction:column;justify-content:center;gap:22px}
+.auth-lado h1{font-size:2.2rem;margin:0;line-height:1.15}
+.auth-lado p{opacity:.9;max-width:42ch;margin:0}
+.auth-lado .logo{width:56px;height:56px;border-radius:16px}
+.auth-lado .logo .ico{width:30px;height:30px}
+.auth-lado ul{list-style:none;padding:0;margin:0;display:grid;gap:14px}
+.auth-lado li{display:flex;gap:12px;align-items:center}
+.auth-lado li .ico{color:var(--oro);width:22px;height:22px}
+
+.auth-form{display:flex;align-items:center;justify-content:center;padding:32px 20px}
+.auth-caja{width:100%;max-width:410px}
+.auth-tabs{display:grid;grid-template-columns:1fr 1fr;background:#e8ede6;border-radius:12px;padding:4px;margin-bottom:22px}
+.auth-tabs button{border:0;background:transparent;padding:10px;border-radius:9px;font:inherit;font-weight:600;color:var(--suave);cursor:pointer;display:flex;gap:8px;align-items:center;justify-content:center}
+.auth-tabs button[aria-selected="true"]{background:#fff;color:var(--selva);box-shadow:0 1px 3px rgba(0,0,0,.08)}
+.auth-caja h2{margin:0 0 4px}
+.auth-caja .intro{margin-bottom:18px}
+
+.ver-clave{position:absolute;right:6px;top:50%;transform:translateY(-50%);border:0;background:transparent;color:var(--suave);cursor:pointer;padding:6px;border-radius:8px;display:grid}
+.ver-clave:hover{background:#eef3ee}
+.fila-2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.recordar{display:flex;align-items:center;gap:6px;font-size:.9rem;color:var(--suave);margin:-4px 0 16px}
+.recordar input{accent-color:var(--selva-2)}
+.msg-error{color:var(--error);font-size:.88rem;min-height:1.3em;margin:4px 0 10px;display:flex;gap:6px;align-items:center}
+.separador{display:flex;align-items:center;gap:10px;color:var(--suave);font-size:.85rem;margin:16px 0}
+.separador::before,.separador::after{content:"";flex:1;border-top:1px solid var(--borde)}
+.fuerza{height:5px;border-radius:99px;background:#e8ede6;margin-top:6px;overflow:hidden}
+.fuerza span{display:block;height:100%;width:0;transition:width .2s,background .2s}
+
+@media (max-width:860px){
+  .auth{grid-template-columns:1fr}
+  .auth-lado{padding:26px 22px;gap:10px}
+  .auth-lado h1{font-size:1.6rem}
+  .auth-lado ul{display:none}
+}
+@media (max-width:480px){ .fila-2{grid-template-columns:1fr} }

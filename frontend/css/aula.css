@@ -1,0 +1,21 @@
+/* =========================================================
+   Aula virtual
+   ========================================================= */
+.leccion{background:var(--tarjeta);border:1px solid var(--borde);border-radius:var(--radio);padding:22px;box-shadow:var(--sombra)}
+.leccion h3{font-size:1.25rem;margin:6px 0 10px}
+.leccion ol,.leccion ul{padding-left:20px}
+.leccion li{margin-bottom:4px}
+.leccion hr{border:0;border-top:1px solid var(--borde);margin:20px 0}
+.volver{margin-bottom:14px}
+
+.pasos{display:flex;gap:6px;margin:4px 0 14px;flex-wrap:wrap}
+.pasos button{width:34px;height:34px;border-radius:50%;border:2px solid var(--borde);background:#fff;font:inherit;font-weight:700;cursor:pointer;color:var(--suave);display:grid;place-items:center}
+.pasos button.hecho{background:#e7f3ec;border-color:var(--selva-2);color:var(--selva-2)}
+.pasos button[aria-current="step"]{border-color:var(--oro);background:var(--oro);color:var(--selva)}
+
+.quiz{background:#f7faf6;border-radius:12px;padding:14px 16px}
+.opciones label{display:flex;gap:8px;align-items:center;padding:10px 12px;border:1px solid var(--borde);border-radius:10px;margin:6px 0;cursor:pointer;background:#fff}
+.opciones label:hover{border-color:var(--selva-2)}
+.opciones label:has(input:checked){border-color:var(--selva-2);background:#eef7f1}
+.opciones input{accent-color:var(--selva-2)}
+#retro{min-height:1.5em}

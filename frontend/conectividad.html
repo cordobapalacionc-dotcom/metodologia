@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Mapa de conectividad · Quibdó Conecta</title>
+  <meta name="theme-color" content="#0f5132">
+  <link rel="manifest" href="/manifest.webmanifest">
+  <link rel="icon" href="/img/logo.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="/vendor/leaflet/leaflet.css">
+  <link rel="stylesheet" href="/css/base.css">
+  <link rel="stylesheet" href="/css/conectividad.css">
+  <script src="/vendor/leaflet/leaflet.js"></script>
+  <script type="module" src="/js/conectividad.js"></script>
+</head>
+<body data-pagina="conectividad">
+  <a class="saltar" href="#contenido">Saltar al contenido</a>
+  <header id="cabecera" class="cabecera"></header>
+
+  <main id="contenido">
+    <div class="titulo-pagina">
+      <div class="ico-caja rio"><svg class="ico ico-grande" aria-hidden="true"><use href="/img/iconos.svg#i-wifi"/></svg></div>
+      <h2>Mapa de conectividad</h2>
+    </div>
+    <p class="intro">Puntos de Wi-Fi gratuito, sitios de acceso comunitario y zonas con dificultad de señal en Quibdó. Las partes del mapa que ya viste quedan guardadas para consultarlas sin conexión.</p>
+    <div class="aviso">
+      <svg class="ico" aria-hidden="true"><use href="/img/iconos.svg#i-alerta"/></svg>
+      <span><b>Prototipo:</b> los puntos iniciales tienen <b>ubicaciones aproximadas de ejemplo</b>. En la versión real se alimentarían con información de la Alcaldía, MinTIC y reportes verificados de la comunidad.</span>
+    </div>
+
+    <div class="barra-mapa">
+      <div class="filtros" id="filtrosMapa" role="group" aria-label="Filtrar puntos">
+        <button data-filtro="todos" aria-pressed="true">Todos</button>
+        <button data-filtro="wifi" aria-pressed="false"><i class="punto-ley" style="background:#16a34a"></i> Wi-Fi gratuito</button>
+        <button data-filtro="comunitario" aria-pressed="false"><i class="punto-ley" style="background:#2563eb"></i> Acceso comunitario</button>
+        <button data-filtro="zona" aria-pressed="false"><i class="punto-ley" style="background:#dc2626"></i> Zonas con dificultad</button>
+      </div>
+      <button class="btn sec" id="btnMiUbicacion"><svg class="ico" aria-hidden="true"><use href="/img/iconos.svg#i-pin"/></svg> Mi ubicación</button>
+    </div>
+
+    <div class="mapa-wrap">
+      <div class="mapa-caja">
+        <div id="mapa" class="mapa" role="region" aria-label="Mapa de Quibdó con puntos de conexión"></div>
+        <div class="indicacion-mapa" id="indicacionMapa" hidden>Toca el mapa donde está el lugar</div>
+        <p class="mapa-error" id="mapaError" hidden></p>
+      </div>
+
+      <div class="panel-lateral">
+        <div class="card" id="cercano" hidden></div>
+        <div class="card" id="detallePunto" aria-live="polite">
+          <h3><svg class="ico" aria-hidden="true"><use href="/img/iconos.svg#i-pin"/></svg> Selecciona un punto</h3>
+          <p>Toca un punto del mapa o de la lista para ver horario, tipo de acceso y calidad de la señal.</p>
+        </div>
+        <div class="card">
+          <h3><svg class="ico" aria-hidden="true"><use href="/img/iconos.svg#i-pin"/></svg> Reportar un punto o zona</h3>
+          <p>¿Conoces un lugar con Wi-Fi o un sector sin señal? Ayuda a mejorar el mapa.</p>
+          <form id="formReporte">
+            <div class="campo"><label class="t" for="repLugar">Lugar o barrio</label>
+              <input type="text" id="repLugar" placeholder="Ej: Biblioteca del barrio" maxlength="80" required></div>
+            <div class="campo"><label class="t" for="repTipo">¿Qué hay allí?</label>
+              <select id="repTipo">
+                <option value="wifi">Hay Wi-Fi gratuito</option>
+                <option value="comunitario">Acceso comunitario (biblioteca, colegio…)</option>
+                <option value="zona">No hay señal / muy mala</option>
+              </select></div>
+            <div class="campo acciones">
+              <button type="button" class="btn sec" id="btnUbicar"><svg class="ico" aria-hidden="true"><use href="/img/iconos.svg#i-pin"/></svg> Marcar en el mapa</button>
+              <button type="button" class="btn fantasma" id="btnUbicarAqui">Estoy aquí</button>
+            </div>
+            <p id="estadoUbicacion" class="correcto" style="margin:-6px 0 12px"></p>
+            <button class="btn" type="submit"><svg class="ico" aria-hidden="true"><use href="/img/iconos.svg#i-check"/></svg> Enviar reporte</button>
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <section class="lista-puntos">
+      <h3>Todos los puntos <small id="ordenLista"></small></h3>
+      <ul id="listaPuntos"></ul>
+    </section>
+  </main>
+
+  <footer>Quibdó Conecta · Mapa de conectividad · Mapa base © colaboradores de OpenStreetMap</footer>
+</body>
+</html>

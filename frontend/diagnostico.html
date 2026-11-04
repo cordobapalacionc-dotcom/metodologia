@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Diagnóstico digital · Quibdó Conecta</title>
+  <meta name="theme-color" content="#0f5132">
+  <link rel="manifest" href="/manifest.webmanifest">
+  <link rel="icon" href="/img/logo.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="/css/base.css">
+  <link rel="stylesheet" href="/css/diagnostico.css">
+  <script type="module" src="/js/diagnostico.js"></script>
+</head>
+<body data-pagina="diagnostico">
+  <a class="saltar" href="#contenido">Saltar al contenido</a>
+  <header id="cabecera" class="cabecera"></header>
+
+  <main id="contenido">
+    <div class="titulo-pagina">
+      <div class="ico-caja"><svg class="ico ico-grande" aria-hidden="true"><use href="/img/iconos.svg#i-grafica"/></svg></div>
+      <h2>Diagnóstico digital</h2>
+    </div>
+    <p class="intro">Responde 7 preguntas rápidas. Te daremos una ruta de aprendizaje y, al sumar las respuestas de la comunidad, se puede saber dónde hace falta más apoyo.</p>
+    <div class="aviso info" id="avisoInvitado" hidden>
+      <svg class="ico" aria-hidden="true"><use href="/img/iconos.svg#i-usuario"/></svg>
+      <span>Estás como invitado: tus respuestas cuentan para la comunidad de forma anónima, pero no se guardarán en tu perfil. <a href="/?registro">Crea una cuenta</a>.</span>
+    </div>
+
+    <div class="aviso" id="avisoPendientes" hidden>
+      <svg class="ico" aria-hidden="true"><use href="/img/iconos.svg#i-wifi-off"/></svg>
+      <span id="textoPendientes"></span>
+      <button class="btn sec" id="btnSincronizar" type="button" style="margin-left:auto">Enviar ahora</button>
+    </div>
+
+    <div class="diag-wrap">
+      <form id="formDiag" class="card">
+        <label class="modo-jornada" id="modoJornada" hidden>
+          <input type="checkbox" id="chkJornada">
+          <span><b>Modo jornada:</b> estoy registrando a otra persona (por ejemplo, en una visita de campo).
+            Sus respuestas se guardan de forma anónima y no en tu perfil.</span>
+        </label>
+        <div class="campo"><label class="t" for="edad"><span class="pregunta-num">1</span>¿Qué rango de edad tienes?</label>
+          <select name="edad" id="edad" required>
+            <option value="">Selecciona…</option><option>Menos de 18</option><option>18 a 28</option>
+            <option>29 a 45</option><option>46 a 60</option><option>Más de 60</option>
+          </select></div>
+
+        <fieldset class="campo" style="border:0;padding:0;margin:0 0 16px">
+          <legend class="t" style="font-weight:600;margin-bottom:6px"><span class="pregunta-num">2</span>¿Qué dispositivos tienes? (puedes marcar varios)</legend>
+          <div class="chips">
+            <label><input type="checkbox" name="dispositivos" value="Celular">Celular</label>
+            <label><input type="checkbox" name="dispositivos" value="Computador">Computador</label>
+            <label><input type="checkbox" name="dispositivos" value="Tableta">Tableta</label>
+            <label><input type="checkbox" name="dispositivos" value="Ninguno">Ninguno</label>
+          </div>
+        </fieldset>
+
+        <fieldset class="campo" style="border:0;padding:0;margin:0 0 16px">
+          <legend class="t" style="font-weight:600;margin-bottom:6px"><span class="pregunta-num">3</span>¿Cómo te conectas a Internet?</legend>
+          <div class="chips">
+            <label><input type="radio" name="internet" value="Hogar" required>Internet en casa</label>
+            <label><input type="radio" name="internet" value="Datos">Solo datos del celular</label>
+            <label><input type="radio" name="internet" value="Público">Wi-Fi público / comunitario</label>
+            <label><input type="radio" name="internet" value="No tengo">No tengo acceso</label>
+          </div>
+        </fieldset>
+
+        <div class="campo"><label class="t" for="calidad"><span class="pregunta-num">4</span>¿Qué tan buena es tu conexión?</label>
+          <select name="calidad" id="calidad" required>
+            <option value="">Selecciona…</option><option>Buena</option><option>Regular, a veces se cae</option>
+            <option>Mala, casi no funciona</option><option>No tengo conexión</option>
+          </select></div>
+
+        <div class="campo"><label class="t" for="frecuencia"><span class="pregunta-num">5</span>¿Con qué frecuencia te conectas?</label>
+          <select name="frecuencia" id="frecuencia" required>
+            <option value="">Selecciona…</option><option>Todos los días</option><option>Algunos días a la semana</option>
+            <option>Rara vez</option><option>Nunca</option>
+          </select></div>
+
+        <div class="campo"><label class="t" for="nivelRange"><span class="pregunta-num">6</span>¿Cómo calificas tu manejo de la tecnología? (<span id="nivelTxt">2 – Básico</span>)</label>
+          <input type="range" name="nivel" min="1" max="4" value="2" id="nivelRange">
+          <div class="escala"><span>Ninguno</span><span>Básico</span><span>Intermedio</span><span>Avanzado</span></div></div>
+
+        <fieldset class="campo" style="border:0;padding:0;margin:0 0 16px">
+          <legend class="t" style="font-weight:600;margin-bottom:6px"><span class="pregunta-num">7</span>¿Cuáles son tus principales dificultades?</legend>
+          <div class="chips">
+            <label><input type="checkbox" name="dificultades" value="Costo de datos/Internet">Costo de datos</label>
+            <label><input type="checkbox" name="dificultades" value="Mala señal">Mala señal</label>
+            <label><input type="checkbox" name="dificultades" value="No tengo equipo">No tengo equipo</label>
+            <label><input type="checkbox" name="dificultades" value="No sé usar programas">No sé usar programas</label>
+            <label><input type="checkbox" name="dificultades" value="Miedo a estafas">Miedo a estafas</label>
+            <label><input type="checkbox" name="dificultades" value="Falta de tiempo">Falta de tiempo</label>
+            <label><input type="checkbox" name="dificultades" value="Cortes de energía">Cortes de energía</label>
+          </div>
+        </fieldset>
+
+        <div class="campo"><label class="t" for="diagBarrio">Barrio o sector (opcional)</label>
+          <input type="text" name="barrio" id="diagBarrio" placeholder="Ej: Centro, Kennedy, Zona Norte…" maxlength="80"></div>
+
+        <button class="btn btn-bloque" type="submit"><svg class="ico" aria-hidden="true"><use href="/img/iconos.svg#i-grafica"/></svg> Ver mi resultado</button>
+      </form>
+
+      <aside class="diag-lateral">
+        <div id="resultadoDiag" aria-live="polite"></div>
+        <div class="card">
+          <h3><svg class="ico" aria-hidden="true"><use href="/img/iconos.svg#i-usuarios"/></svg> Panel de la comunidad</h3>
+          <p>Resumen anónimo de todos los diagnósticos. Sirve para orientar jornadas en colegios, bibliotecas y juntas de acción comunal.</p>
+          <div id="panelDiag"><div class="esqueleto" style="min-height:120px"></div></div>
+          <a class="btn sec" id="exportar" href="/api/diagnosticos/exportar" hidden>
+            <svg class="ico" aria-hidden="true"><use href="/img/iconos.svg#i-descargar"/></svg> Exportar CSV (admin)</a>
+        </div>
+      </aside>
+    </div>
+  </main>
+
+  <footer>Quibdó Conecta · Diagnóstico digital</footer>
+</body>
+</html>

@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Ingresar · Quibdó Conecta</title>
+  <meta name="description" content="Plataforma de inclusión digital para Quibdó: aula virtual, mapa de conectividad, recursos sin conexión, oportunidades y diagnóstico digital.">
+  <meta name="theme-color" content="#0f5132">
+  <link rel="manifest" href="/manifest.webmanifest">
+  <link rel="icon" href="/img/logo.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="/css/base.css">
+  <link rel="stylesheet" href="/css/acceso.css">
+  <script type="module" src="/js/acceso.js"></script>
+</head>
+<body>
+  <div class="auth">
+    <aside class="auth-lado">
+      <div class="logo"><svg class="ico" aria-hidden="true"><use href="/img/iconos.svg#i-logo"/></svg></div>
+      <h1>Quibdó Conecta</h1>
+      <p>Aprender, conectarse y encontrar oportunidades, incluso con poca señal.</p>
+      <ul>
+        <li><svg class="ico" aria-hidden="true"><use href="/img/iconos.svg#i-libro"/></svg> Cursos de informática, Word, Excel y correo</li>
+        <li><svg class="ico" aria-hidden="true"><use href="/img/iconos.svg#i-wifi"/></svg> Puntos de Wi-Fi gratuito en Quibdó</li>
+        <li><svg class="ico" aria-hidden="true"><use href="/img/iconos.svg#i-descargar"/></svg> Guías para estudiar sin conexión</li>
+        <li><svg class="ico" aria-hidden="true"><use href="/img/iconos.svg#i-birrete"/></svg> Becas, empleo y emprendimiento</li>
+      </ul>
+    </aside>
+
+    <main class="auth-form">
+      <div class="auth-caja">
+        <div class="auth-tabs" role="tablist">
+          <button type="button" role="tab" id="tabLogin" aria-selected="true" aria-controls="formLogin">
+            <svg class="ico" aria-hidden="true"><use href="/img/iconos.svg#i-entrar"/></svg> Iniciar sesión</button>
+          <button type="button" role="tab" id="tabRegistro" aria-selected="false" aria-controls="formRegistro">
+            <svg class="ico" aria-hidden="true"><use href="/img/iconos.svg#i-usuario-mas"/></svg> Registrarse</button>
+        </div>
+
+        <!-- Iniciar sesión -->
+        <form id="formLogin" novalidate>
+          <h2>Bienvenido de nuevo</h2>
+          <p class="intro">Ingresa con tu correo y contraseña.</p>
+          <div class="campo">
+            <label class="t" for="logCorreo">Correo electrónico</label>
+            <div class="input-ico"><svg class="ico" aria-hidden="true"><use href="/img/iconos.svg#i-correo"/></svg>
+              <input type="email" id="logCorreo" placeholder="tucorreo@ejemplo.com" autocomplete="email" required></div>
+          </div>
+          <div class="campo">
+            <label class="t" for="logClave">Contraseña</label>
+            <div class="input-ico"><svg class="ico" aria-hidden="true"><use href="/img/iconos.svg#i-candado"/></svg>
+              <input type="password" id="logClave" placeholder="Tu contraseña" autocomplete="current-password" required>
+              <button type="button" class="ver-clave" data-para="logClave" aria-label="Mostrar contraseña">
+                <svg class="ico" aria-hidden="true"><use href="/img/iconos.svg#i-ojo"/></svg></button></div>
+          </div>
+          <label class="recordar"><input type="checkbox" id="logRecordar" checked> Mantener la sesión iniciada en este dispositivo</label>
+          <p class="msg-error" id="errLogin" role="alert"></p>
+          <button class="btn btn-bloque" type="submit"><svg class="ico" aria-hidden="true"><use href="/img/iconos.svg#i-entrar"/></svg> Ingresar</button>
+          <div class="separador">o</div>
+          <button class="btn fantasma btn-bloque" type="button" id="btnInvitado">
+            <svg class="ico" aria-hidden="true"><use href="/img/iconos.svg#i-usuario"/></svg> Continuar como invitado</button>
+        </form>
+
+        <!-- Registrarse -->
+        <form id="formRegistro" novalidate hidden>
+          <h2>Crea tu cuenta</h2>
+          <p class="intro">Es gratis. Tu avance quedará guardado en tu cuenta.</p>
+          <div class="campo">
+            <label class="t" for="regNombre">Nombre completo</label>
+            <div class="input-ico"><svg class="ico" aria-hidden="true"><use href="/img/iconos.svg#i-usuario"/></svg>
+              <input type="text" id="regNombre" placeholder="Ej: María Mosquera" autocomplete="name" maxlength="80" required></div>
+          </div>
+          <div class="campo">
+            <label class="t" for="regCorreo">Correo electrónico</label>
+            <div class="input-ico"><svg class="ico" aria-hidden="true"><use href="/img/iconos.svg#i-correo"/></svg>
+              <input type="email" id="regCorreo" placeholder="tucorreo@ejemplo.com" autocomplete="email" maxlength="120" required></div>
+          </div>
+          <div class="fila-2">
+            <div class="campo">
+              <label class="t" for="regPerfil">Soy…</label>
+              <div class="input-ico"><svg class="ico" aria-hidden="true"><use href="/img/iconos.svg#i-usuarios"/></svg>
+                <select id="regPerfil" required>
+                  <option value="">Selecciona</option><option>Estudiante</option><option>Adulto</option>
+                  <option>Docente</option><option>Emprendedor</option><option>Adulto mayor</option>
+                </select></div>
+            </div>
+            <div class="campo">
+              <label class="t" for="regBarrio">Barrio / sector</label>
+              <div class="input-ico"><svg class="ico" aria-hidden="true"><use href="/img/iconos.svg#i-pin"/></svg>
+                <input type="text" id="regBarrio" placeholder="Opcional" maxlength="80"></div>
+            </div>
+          </div>
+          <div class="campo">
+            <label class="t" for="regClave">Contraseña</label>
+            <div class="input-ico"><svg class="ico" aria-hidden="true"><use href="/img/iconos.svg#i-candado"/></svg>
+              <input type="password" id="regClave" placeholder="Mínimo 6 caracteres" autocomplete="new-password" required>
+              <button type="button" class="ver-clave" data-para="regClave" aria-label="Mostrar contraseña">
+                <svg class="ico" aria-hidden="true"><use href="/img/iconos.svg#i-ojo"/></svg></button></div>
+            <div class="fuerza"><span id="fuerzaBarra"></span></div>
+            <small id="fuerzaTxt" style="color:var(--suave)"></small>
+          </div>
+          <div class="campo">
+            <label class="t" for="regClave2">Confirmar contraseña</label>
+            <div class="input-ico"><svg class="ico" aria-hidden="true"><use href="/img/iconos.svg#i-candado"/></svg>
+              <input type="password" id="regClave2" placeholder="Repite la contraseña" autocomplete="new-password" required></div>
+          </div>
+          <label class="recordar"><input type="checkbox" id="regTerminos"> Acepto el tratamiento de mis datos para fines educativos</label>
+          <p class="msg-error" id="errRegistro" role="alert"></p>
+          <button class="btn btn-bloque" type="submit"><svg class="ico" aria-hidden="true"><use href="/img/iconos.svg#i-usuario-mas"/></svg> Crear cuenta</button>
+        </form>
+      </div>
+    </main>
+  </div>
+</body>
+</html>

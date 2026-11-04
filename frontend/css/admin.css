@@ -1,0 +1,53 @@
+/* =========================================================
+   Panel de administración
+   ========================================================= */
+.tabs-admin{display:flex;gap:6px;flex-wrap:wrap;border-bottom:2px solid var(--borde);margin:10px 0 18px}
+.tabs-admin button{border:0;background:transparent;padding:10px 14px;font:inherit;font-weight:600;color:var(--suave);cursor:pointer;display:flex;gap:7px;align-items:center;border-bottom:3px solid transparent;margin-bottom:-2px}
+.tabs-admin button:hover{color:var(--selva)}
+.tabs-admin button[aria-selected="true"]{color:var(--selva);border-bottom-color:var(--selva-2)}
+.contador{background:var(--error);color:#fff;border-radius:99px;font-size:.72rem;padding:1px 7px}
+
+.cabecera-tab{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;flex-wrap:wrap}
+
+/* Resumen */
+.stats-admin{display:grid;gap:12px;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));margin-bottom:18px}
+.stats-admin .card b{display:block;font-size:2rem;color:var(--selva);line-height:1.1}
+.stats-admin .card span{color:var(--suave);font-size:.88rem}
+.stats-admin .card.alerta{border-color:#f3dc8f;background:#fff8e1}
+
+/* Listas */
+.lista-admin{display:grid;gap:10px}
+.fila-admin{display:flex;gap:14px;align-items:flex-start;background:#fff;border:1px solid var(--borde);border-radius:12px;padding:12px 14px}
+.fila-admin.pendiente{border-left:4px solid var(--oro)}
+.fila-admin .info{flex:1;min-width:0}
+.fila-admin .info b{display:block}
+.fila-admin .info small{color:var(--suave);display:block}
+.fila-admin .acciones{flex:0 0 auto}
+.btn.peligro{background:#fde8e8;color:var(--error)}
+.btn.peligro:hover{background:#fbd5d5}
+
+/* Cursos */
+.curso-admin{margin-bottom:14px}
+.curso-admin > .cab{display:flex;gap:12px;align-items:center;flex-wrap:wrap}
+.curso-admin > .cab .ico-caja{margin:0;width:42px;height:42px}
+.curso-admin > .cab h3{margin:0;flex:1}
+.lecciones-admin{list-style:none;padding:0;margin:12px 0 0;display:grid;gap:6px}
+.lecciones-admin li{display:flex;gap:10px;align-items:center;background:#f7faf6;border-radius:10px;padding:8px 10px}
+.lecciones-admin .num{width:26px;height:26px;border-radius:50%;background:var(--selva-2);color:#fff;display:grid;place-items:center;font-size:.8rem;font-weight:700;flex:0 0 auto}
+.lecciones-admin .tit{flex:1}
+
+/* Tabla de usuarios */
+.tabla-scroll{overflow-x:auto;background:#fff;border:1px solid var(--borde);border-radius:12px}
+.tabla{width:100%;border-collapse:collapse;font-size:.9rem}
+.tabla th,.tabla td{padding:10px 12px;text-align:left;border-bottom:1px solid var(--borde);white-space:nowrap}
+.tabla th{background:#f7faf6;color:var(--suave);font-weight:600;font-size:.82rem}
+.tabla tr:last-child td{border-bottom:0}
+
+textarea{min-height:180px;resize:vertical;font-family:inherit}
+.ayuda{font-size:.8rem;color:var(--suave);margin-top:4px}
+.opcion-fila{display:flex;gap:8px;align-items:center;margin-bottom:6px}
+.opcion-fila input[type=radio]{accent-color:var(--selva-2);width:18px;height:18px}
+
+@media (max-width:640px){
+  .fila-admin{flex-direction:column}
+}

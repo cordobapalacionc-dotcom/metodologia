@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Oportunidades · Quibdó Conecta</title>
+  <meta name="theme-color" content="#0f5132">
+  <link rel="manifest" href="/manifest.webmanifest">
+  <link rel="icon" href="/img/logo.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="/css/base.css">
+  <script type="module" src="/js/oportunidades.js"></script>
+</head>
+<body data-pagina="oportunidades">
+  <a class="saltar" href="#contenido">Saltar al contenido</a>
+  <header id="cabecera" class="cabecera"></header>
+
+  <main id="contenido">
+    <div class="titulo-pagina">
+      <div class="ico-caja oro"><svg class="ico ico-grande" aria-hidden="true"><use href="/img/iconos.svg#i-birrete"/></svg></div>
+      <h2>Oportunidades</h2>
+    </div>
+    <p class="intro">Becas, cursos gratuitos, empleo, convocatorias y apoyo al emprendimiento. Guarda las que te interesen para revisarlas después.</p>
+    <div class="aviso">
+      <svg class="ico" aria-hidden="true"><use href="/img/iconos.svg#i-alerta"/></svg>
+      <span><b>Importante:</b> verifica siempre fechas y requisitos en la página oficial de cada entidad. Las convocatorias oficiales <b>nunca</b> cobran por inscribirte.</span>
+    </div>
+
+    <div class="filtros" id="filtrosOp" role="group" aria-label="Filtrar oportunidades">
+      <button data-filtro="todas" aria-pressed="true">Todas</button>
+      <button data-filtro="Beca" aria-pressed="false">Becas</button>
+      <button data-filtro="Curso" aria-pressed="false">Cursos gratuitos</button>
+      <button data-filtro="Empleo" aria-pressed="false">Empleo</button>
+      <button data-filtro="Convocatoria" aria-pressed="false">Convocatorias</button>
+      <button data-filtro="Emprendimiento" aria-pressed="false">Emprendimiento</button>
+      <button data-filtro="guardadas" aria-pressed="false"><svg class="ico" aria-hidden="true"><use href="/img/iconos.svg#i-estrella"/></svg> Guardadas</button>
+    </div>
+    <div class="grid" id="listaOp"></div>
+  </main>
+
+  <footer>Quibdó Conecta · Oportunidades</footer>
+</body>
+</html>

@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Panel de administración · Quibdó Conecta</title>
+  <meta name="theme-color" content="#0f5132">
+  <meta name="robots" content="noindex">
+  <link rel="icon" href="/img/logo.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="/css/base.css">
+  <link rel="stylesheet" href="/css/admin.css">
+  <script type="module" src="/js/admin.js"></script>
+</head>
+<body data-pagina="admin">
+  <a class="saltar" href="#contenido">Saltar al contenido</a>
+  <header id="cabecera" class="cabecera"></header>
+
+  <main id="contenido">
+    <div class="titulo-pagina">
+      <div class="ico-caja"><svg class="ico ico-grande" aria-hidden="true"><use href="/img/iconos.svg#i-escudo"/></svg></div>
+      <h2>Panel de administración</h2>
+    </div>
+
+    <div id="panel" hidden>
+      <nav class="tabs-admin" role="tablist" aria-label="Secciones del panel">
+        <button role="tab" data-tab="resumen"><svg class="ico" aria-hidden="true"><use href="/img/iconos.svg#i-grafica"/></svg> Resumen</button>
+        <button role="tab" data-tab="reportes"><svg class="ico" aria-hidden="true"><use href="/img/iconos.svg#i-pin"/></svg> Reportes del mapa <span class="contador" id="contReportes" hidden></span></button>
+        <button role="tab" data-tab="cursos"><svg class="ico" aria-hidden="true"><use href="/img/iconos.svg#i-libro"/></svg> Cursos</button>
+        <button role="tab" data-tab="oportunidades"><svg class="ico" aria-hidden="true"><use href="/img/iconos.svg#i-birrete"/></svg> Oportunidades</button>
+        <button role="tab" data-tab="usuarios"><svg class="ico" aria-hidden="true"><use href="/img/iconos.svg#i-usuarios"/></svg> Usuarios</button>
+      </nav>
+
+      <section id="tab-resumen" role="tabpanel" hidden></section>
+
+      <section id="tab-reportes" role="tabpanel" hidden>
+        <p class="intro">Los reportes de la comunidad aparecen como “por verificar”. Revisa la ubicación, corrige los datos si hace falta y apruébalos.</p>
+        <div class="filtros" id="filtroReportes" role="group" aria-label="Filtrar reportes">
+          <button data-f="pendientes" aria-pressed="true">Pendientes</button>
+          <button data-f="todos" aria-pressed="false">Todos los puntos</button>
+        </div>
+        <div id="listaReportes" class="lista-admin"></div>
+      </section>
+
+      <section id="tab-cursos" role="tabpanel" hidden>
+        <div class="cabecera-tab">
+          <p class="intro">Crea cursos y lecciones. El contenido se escribe en texto sencillo.</p>
+          <button class="btn" id="btnNuevoCurso"><svg class="ico" aria-hidden="true"><use href="/img/iconos.svg#i-libro"/></svg> Nuevo curso</button>
+        </div>
+        <div id="listaCursosAdmin"></div>
+      </section>
+
+      <section id="tab-oportunidades" role="tabpanel" hidden>
+        <div class="cabecera-tab">
+          <p class="intro">Publica becas, cursos, empleos, convocatorias y apoyos al emprendimiento.</p>
+          <button class="btn" id="btnNuevaOp"><svg class="ico" aria-hidden="true"><use href="/img/iconos.svg#i-birrete"/></svg> Nueva oportunidad</button>
+        </div>
+        <div id="listaOpAdmin" class="lista-admin"></div>
+      </section>
+
+      <section id="tab-usuarios" role="tabpanel" hidden>
+        <p class="intro">Personas registradas y su avance. Puedes dar o quitar permisos de administrador.</p>
+        <div class="tabla-scroll"><table class="tabla" id="tablaUsuarios"></table></div>
+      </section>
+    </div>
+  </main>
+
+  <!-- Ventana para crear / editar -->
+  <dialog id="dialogo" aria-labelledby="dialogoTitulo">
+    <form id="dialogoForm" novalidate>
+      <header class="dialogo-cabecera">
+        <h3 id="dialogoTitulo"></h3>
+        <button type="button" class="btn-icono" data-cerrar aria-label="Cerrar"><svg class="ico" aria-hidden="true"><use href="/img/iconos.svg#i-cerrar"/></svg></button>
+      </header>
+      <div id="dialogoCuerpo" class="dialogo-cuerpo"></div>
+      <p class="msg-error" id="dialogoError" role="alert"></p>
+      <footer class="acciones dialogo-pie">
+        <button type="button" class="btn fantasma" data-cerrar>Cancelar</button>
+        <button type="submit" class="btn"><svg class="ico" aria-hidden="true"><use href="/img/iconos.svg#i-check"/></svg> Guardar</button>
+      </footer>
+    </form>
+  </dialog>
+
+  <footer>Quibdó Conecta · Panel de administración</footer>
+</body>
+</html>

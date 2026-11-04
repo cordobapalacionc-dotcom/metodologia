@@ -1,0 +1,21 @@
+/* =========================================================
+   Página de inicio
+   ========================================================= */
+.inicio-hero{display:grid;gap:16px;grid-template-columns:1.3fr 1fr;align-items:center;margin-bottom:24px}
+.inicio-hero h2{font-size:1.8rem}
+.tarjeta-progreso{background:linear-gradient(135deg,#fff,#f0f7f2)}
+.accesos .card{text-decoration:none;color:inherit;transition:transform .15s,border-color .15s}
+.accesos .card:hover{transform:translateY(-2px);border-color:var(--selva-2)}
+.accesos .card h3{color:var(--texto)}
+.mis-certificados{margin-bottom:24px}
+.mis-certificados h3{display:flex;align-items:center;gap:8px;color:var(--selva)}
+.certificado-mini{display:flex;gap:12px;align-items:center;text-decoration:none;color:inherit;border-left:4px solid var(--oro)}
+.certificado-mini:hover{border-color:var(--selva-2)}
+.certificado-mini b{display:block}
+.certificado-mini small{color:var(--suave)}
+.ir{color:var(--selva-2);font-weight:600;font-size:.88rem;display:inline-flex;align-items:center;gap:4px}
+
+@media (max-width:760px){
+  .inicio-hero{grid-template-columns:1fr}
+  .inicio-hero h2{font-size:1.4rem}
+}

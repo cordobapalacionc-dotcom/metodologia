@@ -1,0 +1,29 @@
+/* =========================================================
+   Diagnóstico digital
+   ========================================================= */
+.diag-wrap{display:grid;gap:16px;grid-template-columns:1.2fr 1fr;align-items:start}
+.diag-lateral{display:grid;gap:14px;position:sticky;top:150px}
+.pregunta-num{display:inline-grid;place-items:center;width:24px;height:24px;border-radius:50%;background:var(--selva-2);color:#fff;font-size:.8rem;margin-right:6px}
+.escala{display:flex;justify-content:space-between;font-size:.78rem;color:var(--suave)}
+input[type=range]{width:100%;accent-color:var(--selva-2)}
+
+.modo-jornada{display:flex;gap:10px;align-items:flex-start;background:#e0f1f6;border:1px solid #b5dfeb;color:#08506a;border-radius:12px;padding:10px 12px;margin-bottom:18px;font-size:.9rem;cursor:pointer}
+.modo-jornada input{accent-color:var(--rio);margin-top:4px}
+.modo-jornada:has(input:checked){background:#fff4cc;border-color:#f3dc8f;color:#6b5200}
+.resultado{border-left:5px solid var(--oro)}
+.resultado.local{border-left-color:var(--rio)}
+.resultado ol,.resultado ul{padding-left:20px}
+.resultado li{margin-bottom:4px}
+.stats{display:grid;gap:10px;grid-template-columns:repeat(2,1fr);margin:12px 0}
+.stat{background:#f7faf6;border:1px solid var(--borde);border-radius:12px;padding:10px 12px}
+.stat b{display:block;font-size:1.5rem;color:var(--selva)}
+.stat span{font-size:.8rem;color:var(--suave)}
+.fila-barra{display:grid;grid-template-columns:140px 1fr 42px;gap:8px;align-items:center;font-size:.86rem;margin:5px 0}
+.fila-barra .barra{margin:0}
+.fila-barra .barra span{background:var(--rio)}
+
+@media (max-width:860px){
+  .diag-wrap{grid-template-columns:1fr}
+  .diag-lateral{position:static}
+  .fila-barra{grid-template-columns:110px 1fr 40px}
+}

@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Banco de recursos · Quibdó Conecta</title>
+  <meta name="theme-color" content="#0f5132">
+  <link rel="manifest" href="/manifest.webmanifest">
+  <link rel="icon" href="/img/logo.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="/css/base.css">
+  <script type="module" src="/js/recursos.js"></script>
+</head>
+<body data-pagina="recursos">
+  <a class="saltar" href="#contenido">Saltar al contenido</a>
+  <header id="cabecera" class="cabecera"></header>
+
+  <main id="contenido">
+    <div class="titulo-pagina">
+      <div class="ico-caja tierra"><svg class="ico ico-grande" aria-hidden="true"><use href="/img/iconos.svg#i-carpeta"/></svg></div>
+      <h2>Banco de recursos</h2>
+    </div>
+    <p class="intro">Guías prácticas que puedes <b>descargar a tu celular o computador</b> para leerlas después sin conexión. Los archivos son muy livianos (menos de 5 KB).</p>
+
+    <div class="filtros">
+      <div class="input-ico buscador">
+        <svg class="ico" aria-hidden="true"><use href="/img/iconos.svg#i-buscar"/></svg>
+        <input type="search" id="buscarRecurso" placeholder="Buscar guía (ej: Excel, correo, contraseña)…" aria-label="Buscar guía">
+      </div>
+    </div>
+    <div class="grid" id="listaRecursos"></div>
+
+    <div class="aviso info" style="margin-top:18px">
+      <svg class="ico" aria-hidden="true"><use href="/img/iconos.svg#i-bombillo"/></svg>
+      <span><b>Consejo:</b> instala Quibdó Conecta en tu celular (menú del navegador → “Agregar a pantalla de inicio”). Las páginas que ya visitaste se abrirán aunque no tengas Internet.</span>
+    </div>
+  </main>
+
+  <footer>Quibdó Conecta · Banco de recursos</footer>
+</body>
+</html>

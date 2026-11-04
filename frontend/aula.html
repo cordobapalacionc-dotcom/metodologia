@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Aula virtual · Quibdó Conecta</title>
+  <meta name="theme-color" content="#0f5132">
+  <link rel="manifest" href="/manifest.webmanifest">
+  <link rel="icon" href="/img/logo.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="/css/base.css">
+  <link rel="stylesheet" href="/css/aula.css">
+  <script type="module" src="/js/aula.js"></script>
+</head>
+<body data-pagina="aula">
+  <a class="saltar" href="#contenido">Saltar al contenido</a>
+  <header id="cabecera" class="cabecera"></header>
+
+  <main id="contenido">
+    <section id="seccionLista">
+      <div class="titulo-pagina">
+        <div class="ico-caja"><svg class="ico ico-grande" aria-hidden="true"><use href="/img/iconos.svg#i-libro"/></svg></div>
+        <h2>Aula virtual</h2>
+      </div>
+      <p class="intro">Cursos cortos, en lenguaje sencillo y con lecciones de texto livianas (sin videos pesados). Cada lección termina con una pregunta para comprobar lo aprendido.</p>
+      <div class="aviso info" id="avisoInvitado" hidden>
+        <svg class="ico" aria-hidden="true"><use href="/img/iconos.svg#i-usuario"/></svg>
+        <span>Estás como invitado: puedes hacer los cursos, pero tu avance no se guardará. <a href="/?registro">Crea una cuenta gratis</a>.</span>
+      </div>
+      <div class="grid" id="listaCursos"></div>
+    </section>
+
+    <section id="vistaLeccion" hidden></section>
+  </main>
+
+  <footer>Quibdó Conecta · Aula virtual</footer>
+</body>
+</html>

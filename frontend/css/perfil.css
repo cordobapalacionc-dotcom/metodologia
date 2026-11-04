@@ -1,0 +1,64 @@
+/* =========================================================
+   Mi panel (actividad personal del usuario)
+   ========================================================= */
+.ficha{display:flex;align-items:center;gap:18px;flex-wrap:wrap;background:linear-gradient(135deg,#fff,#f0f7f2);margin-bottom:16px}
+.avatar-grande{width:72px;height:72px;border-radius:50%;background:var(--selva-2);color:#fff;display:grid;place-items:center;font-weight:800;font-size:1.6rem;flex:0 0 auto;box-shadow:0 0 0 4px #fff,0 0 0 6px var(--oro)}
+.ficha-datos{flex:1;min-width:200px}
+.ficha-datos h2{margin:0}
+.ficha-datos p{margin:2px 0 0}
+
+.cifras{display:grid;gap:12px;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));margin-bottom:16px}
+.cifra{background:#fff;border:1px solid var(--borde);border-radius:var(--radio);padding:14px;display:flex;gap:12px;align-items:center;box-shadow:var(--sombra)}
+.cifra .ico-caja{margin:0;width:42px;height:42px;flex:0 0 auto}
+.cifra b{display:block;font-size:1.5rem;line-height:1.1;color:var(--selva)}
+.cifra span{font-size:.8rem;color:var(--suave)}
+
+.perfil-grid{display:grid;gap:16px;grid-template-columns:1.2fr 1fr;align-items:start}
+.columna{display:grid;gap:16px}
+.perfil-grid h3{color:var(--selva)}
+
+/* Cursos */
+.curso-fila{display:flex;gap:12px;align-items:center;padding:10px 0;border-bottom:1px solid var(--borde)}
+.curso-fila:last-child{border-bottom:0}
+.curso-fila .ico-caja{margin:0;width:40px;height:40px;flex:0 0 auto}
+.curso-fila .info{flex:1;min-width:0}
+.curso-fila .info b{display:block;font-size:.95rem}
+.curso-fila .info small{color:var(--suave)}
+.curso-fila .barra{margin:5px 0 0}
+.curso-fila .btn{padding:6px 10px;font-size:.85rem;flex:0 0 auto}
+
+/* Evolución de diagnósticos */
+.evo-fila{display:grid;grid-template-columns:86px 1fr;gap:10px;align-items:center;padding:8px 0;border-bottom:1px dashed var(--borde)}
+.evo-fila:last-child{border-bottom:0}
+.evo-fecha{font-size:.8rem;color:var(--suave)}
+.evo-fecha b{display:block;color:var(--texto);font-size:.85rem}
+.evo-barras{display:grid;gap:4px}
+.evo-barra{display:grid;grid-template-columns:78px 1fr 30px;gap:6px;align-items:center;font-size:.75rem;color:var(--suave)}
+.evo-barra .barra{margin:0;height:7px}
+.evo-barra.hab .barra span{background:var(--rio)}
+.evo-perfil{grid-column:2;font-size:.8rem;color:var(--selva);font-weight:600}
+.tendencia{display:inline-flex;align-items:center;gap:4px;font-weight:700;font-size:.85rem;padding:2px 8px;border-radius:99px;margin:4px 6px 10px 0}
+.tendencia.sube{background:#e7f3ec;color:var(--selva-2)}
+.tendencia.baja{background:#fde8e8;color:var(--error)}
+.tendencia.igual{background:#eef2ec;color:var(--suave)}
+
+/* Línea de tiempo */
+.linea-tiempo{list-style:none;margin:0;padding:0;position:relative}
+.linea-tiempo::before{content:"";position:absolute;left:15px;top:6px;bottom:6px;width:2px;background:var(--borde)}
+.linea-tiempo li{display:flex;gap:12px;align-items:flex-start;padding:7px 0;position:relative}
+.linea-tiempo .punto-t{width:32px;height:32px;border-radius:50%;display:grid;place-items:center;background:#e7f3ec;color:var(--selva-2);flex:0 0 auto;border:2px solid #fff;z-index:1}
+.linea-tiempo .punto-t.oro{background:#fff4cc;color:#8a6500}
+.linea-tiempo .punto-t.rio{background:#e0f1f6;color:var(--rio)}
+.linea-tiempo .punto-t.tierra{background:#f4e9df;color:var(--tierra)}
+.linea-tiempo .texto{font-size:.9rem;line-height:1.35}
+.linea-tiempo .texto small{display:block;color:var(--suave);font-size:.78rem}
+
+/* Listas simples */
+.lista-simple{list-style:none;margin:0;padding:0}
+.lista-simple li{display:flex;gap:10px;align-items:center;padding:8px 0;border-bottom:1px solid var(--borde);font-size:.9rem}
+.lista-simple li:last-child{border-bottom:0}
+.lista-simple .info{flex:1;min-width:0}
+.lista-simple small{display:block;color:var(--suave);font-size:.78rem}
+.vacio-mini{color:var(--suave);font-size:.88rem;font-style:italic;margin:4px 0}
+
+@media (max-width:860px){ .perfil-grid{grid-template-columns:1fr} }

@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Mi panel · Quibdó Conecta</title>
+  <meta name="theme-color" content="#0f5132">
+  <link rel="manifest" href="/manifest.webmanifest">
+  <link rel="icon" href="/img/logo.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="/css/base.css">
+  <link rel="stylesheet" href="/css/perfil.css">
+  <script type="module" src="/js/perfil.js"></script>
+</head>
+<body data-pagina="perfil">
+  <a class="saltar" href="#contenido">Saltar al contenido</a>
+  <header id="cabecera" class="cabecera"></header>
+
+  <main id="contenido">
+    <div id="cargando" class="esqueleto" style="min-height:160px"></div>
+
+    <div id="panelPerfil" hidden>
+      <!-- Tarjeta de la persona -->
+      <section class="card ficha">
+        <div class="avatar-grande" id="avatarGrande" aria-hidden="true"></div>
+        <div class="ficha-datos">
+          <h2 id="nombre"></h2>
+          <p id="subtitulo"></p>
+        </div>
+        <div class="acciones">
+          <button class="btn sec" id="btnEditar"><svg class="ico" aria-hidden="true"><use href="/img/iconos.svg#i-usuario"/></svg> Editar mis datos</button>
+          <button class="btn fantasma" id="btnClave"><svg class="ico" aria-hidden="true"><use href="/img/iconos.svg#i-candado"/></svg> Cambiar contraseña</button>
+        </div>
+      </section>
+
+      <!-- Cifras -->
+      <section class="cifras" id="cifras" aria-label="Resumen de mi actividad"></section>
+
+      <div class="perfil-grid">
+        <div class="columna">
+          <section class="card">
+            <h3><svg class="ico" aria-hidden="true"><use href="/img/iconos.svg#i-libro"/></svg> Mis cursos</h3>
+            <div id="misCursos"></div>
+          </section>
+
+          <section class="card">
+            <h3><svg class="ico" aria-hidden="true"><use href="/img/iconos.svg#i-grafica"/></svg> Mi evolución digital</h3>
+            <p>Cómo han cambiado tu acceso a la tecnología y tus habilidades en cada diagnóstico.</p>
+            <div id="evolucion"></div>
+          </section>
+
+          <section class="card">
+            <h3><svg class="ico" aria-hidden="true"><use href="/img/iconos.svg#i-birrete"/></svg> Mis certificados</h3>
+            <div id="misCertificados"></div>
+          </section>
+        </div>
+
+        <div class="columna">
+          <section class="card">
+            <h3><svg class="ico" aria-hidden="true"><use href="/img/iconos.svg#i-check"/></svg> Actividad reciente</h3>
+            <ol class="linea-tiempo" id="actividad"></ol>
+          </section>
+
+          <section class="card">
+            <h3><svg class="ico" aria-hidden="true"><use href="/img/iconos.svg#i-estrella"/></svg> Oportunidades guardadas</h3>
+            <ul class="lista-simple" id="misGuardadas"></ul>
+          </section>
+
+          <section class="card">
+            <h3><svg class="ico" aria-hidden="true"><use href="/img/iconos.svg#i-descargar"/></svg> Guías descargadas</h3>
+            <ul class="lista-simple" id="misDescargas"></ul>
+          </section>
+
+          <section class="card">
+            <h3><svg class="ico" aria-hidden="true"><use href="/img/iconos.svg#i-pin"/></svg> Mis reportes en el mapa</h3>
+            <ul class="lista-simple" id="misReportes"></ul>
+          </section>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- Ventana para editar datos / cambiar contraseña -->
+  <dialog id="dialogo" aria-labelledby="dialogoTitulo">
+    <form id="dialogoForm" novalidate>
+      <header class="dialogo-cabecera">
+        <h3 id="dialogoTitulo"></h3>
+        <button type="button" class="btn-icono" data-cerrar aria-label="Cerrar"><svg class="ico" aria-hidden="true"><use href="/img/iconos.svg#i-cerrar"/></svg></button>
+      </header>
+      <div id="dialogoCuerpo" class="dialogo-cuerpo"></div>
+      <p class="msg-error" id="dialogoError" role="alert"></p>
+      <footer class="acciones dialogo-pie">
+        <button type="button" class="btn fantasma" data-cerrar>Cancelar</button>
+        <button type="submit" class="btn"><svg class="ico" aria-hidden="true"><use href="/img/iconos.svg#i-check"/></svg> Guardar</button>
+      </footer>
+    </form>
+  </dialog>
+
+  <footer>Quibdó Conecta · Mi panel</footer>
+</body>
+</html>
