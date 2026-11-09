@@ -28,6 +28,8 @@
 
     <main class="auth-form">
       <div class="auth-caja">
+        <div class="aviso info" id="avisoInvitacion" hidden><svg class="ico" aria-hidden="true"><use href="/img/iconos.svg#i-usuarios"/></svg>
+          <span>Te invitaron a un curso. Inicia sesión o crea tu cuenta y entrarás directamente.</span></div>
         <div class="auth-tabs" role="tablist">
           <button type="button" role="tab" id="tabLogin" aria-selected="true" aria-controls="formLogin">
             <svg class="ico" aria-hidden="true"><use href="/img/iconos.svg#i-entrar"/></svg> Iniciar sesión</button>
@@ -51,12 +53,46 @@
               <button type="button" class="ver-clave" data-para="logClave" aria-label="Mostrar contraseña">
                 <svg class="ico" aria-hidden="true"><use href="/img/iconos.svg#i-ojo"/></svg></button></div>
           </div>
-          <label class="recordar"><input type="checkbox" id="logRecordar" checked> Mantener la sesión iniciada en este dispositivo</label>
+          <div class="fila-recordar">
+            <label class="recordar"><input type="checkbox" id="logRecordar" checked> Mantener la sesión iniciada</label>
+            <button type="button" class="enlace" id="btnOlvide">¿Olvidaste tu contraseña?</button>
+          </div>
           <p class="msg-error" id="errLogin" role="alert"></p>
           <button class="btn btn-bloque" type="submit"><svg class="ico" aria-hidden="true"><use href="/img/iconos.svg#i-entrar"/></svg> Ingresar</button>
           <div class="separador">o</div>
           <button class="btn fantasma btn-bloque" type="button" id="btnInvitado">
             <svg class="ico" aria-hidden="true"><use href="/img/iconos.svg#i-usuario"/></svg> Continuar como invitado</button>
+        </form>
+
+        <!-- Recuperar la contraseña con un código -->
+        <form id="formRecuperar" novalidate hidden>
+          <h2>Crea una contraseña nueva</h2>
+          <p class="intro">Pide un <b>código de recuperación</b> a tu facilitador o al administrador de la plataforma
+            (por ejemplo, en el punto de atención o por WhatsApp). El código sirve una sola vez y vence en 24 horas.</p>
+          <div class="campo">
+            <label class="t" for="recCorreo">Correo de tu cuenta</label>
+            <div class="input-ico"><svg class="ico" aria-hidden="true"><use href="/img/iconos.svg#i-correo"/></svg>
+              <input type="email" id="recCorreo" placeholder="tucorreo@ejemplo.com" autocomplete="email" required></div>
+          </div>
+          <div class="campo">
+            <label class="t" for="recCodigo">Código de recuperación</label>
+            <div class="input-ico"><svg class="ico" aria-hidden="true"><use href="/img/iconos.svg#i-escudo"/></svg>
+              <input type="text" id="recCodigo" placeholder="ABCD-EFGH" maxlength="12" autocomplete="one-time-code" autocapitalize="characters" spellcheck="false" class="input-codigo" required></div>
+          </div>
+          <div class="campo">
+            <label class="t" for="recClave">Contraseña nueva</label>
+            <div class="input-ico"><svg class="ico" aria-hidden="true"><use href="/img/iconos.svg#i-candado"/></svg>
+              <input type="password" id="recClave" placeholder="Mínimo 6 caracteres" autocomplete="new-password" required>
+              <button type="button" class="ver-clave" data-para="recClave" aria-label="Mostrar contraseña"><svg class="ico" aria-hidden="true"><use href="/img/iconos.svg#i-ojo"/></svg></button></div>
+          </div>
+          <div class="campo">
+            <label class="t" for="recClave2">Confirmar contraseña nueva</label>
+            <div class="input-ico"><svg class="ico" aria-hidden="true"><use href="/img/iconos.svg#i-candado"/></svg>
+              <input type="password" id="recClave2" placeholder="Repite la contraseña" autocomplete="new-password" required></div>
+          </div>
+          <p class="msg-error" id="errRecuperar" role="alert"></p>
+          <button class="btn btn-bloque" type="submit"><svg class="ico" aria-hidden="true"><use href="/img/iconos.svg#i-check"/></svg> Guardar y entrar</button>
+          <button class="btn fantasma btn-bloque volver-login" type="button" id="btnVolverLogin"><svg class="ico" aria-hidden="true"><use href="/img/iconos.svg#i-izq"/></svg> Volver a iniciar sesión</button>
         </form>
 
         <!-- Registrarse -->

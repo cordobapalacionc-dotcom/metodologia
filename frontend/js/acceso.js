@@ -4,22 +4,33 @@ import { $, $$, ico, esc, obtenerUsuario, recordarUsuario, registrarServiceWorke
 
 registrarServiceWorker();
 
-// Si ya hay sesión, ir directo al inicio
-if (await obtenerUsuario()) location.replace('/inicio');
+/** Adónde ir después de entrar: si llegó con una invitación a un curso, al aula para unirse. */
+const params = new URLSearchParams(location.search);
+const destino = () => params.get('unirse') ? `/aula?unirse=${encodeURIComponent(params.get('unirse'))}` : '/inicio';
 
-/* ---------- Pestañas ---------- */
+// Si ya hay sesión, ir directo
+if (await obtenerUsuario()) location.replace(destino());
+
+/* ---------- Pestañas: login · registro · recuperar ---------- */
 function mostrar(cual) {
-  const login = cual === 'login';
-  $('#tabLogin').setAttribute('aria-selected', login);
-  $('#tabRegistro').setAttribute('aria-selected', !login);
-  $('#formLogin').hidden = !login;
-  $('#formRegistro').hidden = login;
-  $('#errLogin').innerHTML = $('#errRegistro').innerHTML = '';
-  (login ? $('#logCorreo') : $('#regNombre')).focus();
+  $('#tabLogin').setAttribute('aria-selected', cual !== 'registro');
+  $('#tabRegistro').setAttribute('aria-selected', cual === 'registro');
+  $('#formLogin').hidden = cual !== 'login';
+  $('#formRegistro').hidden = cual !== 'registro';
+  $('#formRecuperar').hidden = cual !== 'recuperar';
+  $('#errLogin').innerHTML = $('#errRegistro').innerHTML = $('#errRecuperar').innerHTML = '';
+  ({ login: $('#logCorreo'), registro: $('#regNombre'), recuperar: $('#recCorreo') })[cual].focus();
 }
 $('#tabLogin').addEventListener('click', () => mostrar('login'));
 $('#tabRegistro').addEventListener('click', () => mostrar('registro'));
-if (new URLSearchParams(location.search).has('registro')) mostrar('registro');
+$('#btnOlvide').addEventListener('click', () => {
+  $('#recCorreo').value = $('#logCorreo').value.trim();
+  mostrar('recuperar');
+});
+$('#btnVolverLogin').addEventListener('click', () => mostrar('login'));
+if (params.has('registro')) mostrar('registro');
+if (params.has('recuperar')) mostrar('recuperar');
+if (params.get('unirse')) $('#avisoInvitacion').hidden = false;
 
 /* ---------- Mostrar / ocultar contraseña ---------- */
 $$('.ver-clave').forEach(b => b.addEventListener('click', () => {
@@ -54,7 +65,7 @@ async function enviar(form, sel, fn) {
   try {
     const { usuario } = await fn();
     recordarUsuario(usuario);
-    location.href = '/inicio';
+    location.href = destino();
   } catch (e) {
     error(sel, e.message);
     boton.disabled = false;
@@ -88,6 +99,21 @@ $('#formRegistro').addEventListener('submit', e => {
   if (datos.clave !== $('#regClave2').value) return error('#errRegistro', 'Las contraseñas no coinciden.');
   if (!datos.aceptaDatos) return error('#errRegistro', 'Debes aceptar el tratamiento de datos.');
   enviar(e.target, '#errRegistro', () => api('/auth/registro', { metodo: 'POST', datos }));
+});
+
+/* ---------- Recuperar la contraseña ---------- */
+$('#formRecuperar').addEventListener('submit', e => {
+  e.preventDefault();
+  const datos = {
+    correo: $('#recCorreo').value.trim(),
+    codigo: $('#recCodigo').value.trim(),
+    clave: $('#recClave').value,
+  };
+  if (!datos.correo) return error('#errRecuperar', 'Escribe el correo de tu cuenta.');
+  if (datos.codigo.replace(/[\s-]/g, '').length !== 8) return error('#errRecuperar', 'El código tiene 8 letras y números, por ejemplo ABCD-EFGH.');
+  if (datos.clave.length < 6) return error('#errRecuperar', 'La contraseña nueva debe tener al menos 6 caracteres.');
+  if (datos.clave !== $('#recClave2').value) return error('#errRecuperar', 'Las contraseñas no coinciden.');
+  enviar(e.target, '#errRecuperar', () => api('/auth/recuperar', { metodo: 'POST', datos }));
 });
 
 /* ---------- Invitado ---------- */

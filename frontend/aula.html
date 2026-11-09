@@ -26,6 +26,14 @@
         <svg class="ico" aria-hidden="true"><use href="/img/iconos.svg#i-usuario"/></svg>
         <span>Estás como invitado: puedes hacer los cursos, pero tu avance no se guardará. <a href="/?registro">Crea una cuenta gratis</a>.</span>
       </div>
+      <form class="card unirse" id="formUnirse" novalidate>
+        <label class="t" for="codigoCurso"><svg class="ico" aria-hidden="true"><use href="/img/iconos.svg#i-usuarios"/></svg> ¿Tu facilitador te dio un código de curso?</label>
+        <div class="acciones">
+          <input type="text" id="codigoCurso" placeholder="Ej: K7P2QX" maxlength="9" autocomplete="off" autocapitalize="characters" spellcheck="false">
+          <button class="btn" type="submit">Unirme</button>
+        </div>
+        <p class="msg-error" id="errUnirse" role="alert"></p>
+      </form>
       <div class="grid" id="listaCursos"></div>
     </section>
 

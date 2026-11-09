@@ -24,13 +24,27 @@
     <div id="panel" hidden>
       <nav class="tabs-admin" role="tablist" aria-label="Secciones del panel">
         <button role="tab" data-tab="resumen"><svg class="ico" aria-hidden="true"><use href="/img/iconos.svg#i-grafica"/></svg> Resumen</button>
+        <button role="tab" data-tab="impacto"><svg class="ico" aria-hidden="true"><use href="/img/iconos.svg#i-estrella"/></svg> Impacto</button>
         <button role="tab" data-tab="reportes"><svg class="ico" aria-hidden="true"><use href="/img/iconos.svg#i-pin"/></svg> Reportes del mapa <span class="contador" id="contReportes" hidden></span></button>
         <button role="tab" data-tab="cursos"><svg class="ico" aria-hidden="true"><use href="/img/iconos.svg#i-libro"/></svg> Cursos</button>
         <button role="tab" data-tab="oportunidades"><svg class="ico" aria-hidden="true"><use href="/img/iconos.svg#i-birrete"/></svg> Oportunidades</button>
         <button role="tab" data-tab="usuarios"><svg class="ico" aria-hidden="true"><use href="/img/iconos.svg#i-usuarios"/></svg> Usuarios</button>
+        <button role="tab" data-tab="copias"><svg class="ico" aria-hidden="true"><use href="/img/iconos.svg#i-carpeta"/></svg> Copias de seguridad</button>
       </nav>
 
       <section id="tab-resumen" role="tabpanel" hidden></section>
+
+      <section id="tab-impacto" role="tabpanel" hidden>
+        <div class="cabecera-tab">
+          <p class="intro">Cifras para mostrar a aliados (Alcaldía, Gobernación, SENA, MinTIC, universidades): cuántas personas se forman, dónde y qué necesita la comunidad.</p>
+          <div class="acciones">
+            <a class="btn sec" href="/api/admin/impacto.csv" download><svg class="ico" aria-hidden="true"><use href="/img/iconos.svg#i-descargar"/></svg> Descargar Excel (CSV)</a>
+            <button class="btn" id="btnImprimirImpacto"><svg class="ico" aria-hidden="true"><use href="/img/iconos.svg#i-documento"/></svg> Imprimir / PDF</button>
+          </div>
+        </div>
+        <div class="titulo-impreso">Quibdó Conecta · Informe de impacto</div>
+        <div id="impacto"></div>
+      </section>
 
       <section id="tab-reportes" role="tabpanel" hidden>
         <p class="intro">Los reportes de la comunidad aparecen como “por verificar”. Revisa la ubicación, corrige los datos si hace falta y apruébalos.</p>
@@ -58,8 +72,29 @@
       </section>
 
       <section id="tab-usuarios" role="tabpanel" hidden>
-        <p class="intro">Personas registradas y su avance. Puedes dar o quitar permisos de administrador.</p>
+        <p class="intro">Personas registradas y su avance. Puedes cambiar su rol (usuario, facilitador o administrador) y,
+          si alguien olvidó su contraseña, generarle un código para que cree una nueva.</p>
         <div class="tabla-scroll"><table class="tabla" id="tablaUsuarios"></table></div>
+      </section>
+
+      <section id="tab-copias" role="tabpanel" hidden>
+        <div class="cabecera-tab">
+          <p class="intro">La plataforma guarda sola una copia de la base de datos cada 24 horas y conserva las 30 más recientes.
+            También puedes crear una ahora, por ejemplo antes de hacer cambios grandes.</p>
+          <button class="btn" id="btnCopia"><svg class="ico" aria-hidden="true"><use href="/img/iconos.svg#i-carpeta"/></svg> Crear copia ahora</button>
+        </div>
+        <div class="aviso"><svg class="ico" aria-hidden="true"><use href="/img/iconos.svg#i-candado"/></svg>
+          <span>Las copias contienen los datos personales de todas las personas. Guárdalas en un lugar seguro y no las compartas.</span></div>
+        <div class="tabla-scroll"><table class="tabla" id="tablaCopias"></table></div>
+        <details class="card ayuda-restaurar">
+          <summary><svg class="ico" aria-hidden="true"><use href="/img/iconos.svg#i-alerta"/></svg> ¿Cómo restaurar una copia?</summary>
+          <ol>
+            <li>Detén el servidor (Ctrl + C en la ventana donde corre).</li>
+            <li>En la carpeta <code>backend</code>, ejecuta <code>npm run restaurar</code> para ver la lista de copias.</li>
+            <li>Ejecuta <code>npm run restaurar -- nombre-de-la-copia.db</code>. Antes de reemplazar, se guarda una copia de la base actual.</li>
+            <li>Vuelve a encender el servidor con <code>npm start</code>.</li>
+          </ol>
+        </details>
       </section>
     </div>
   </main>

@@ -2,6 +2,7 @@ import crypto from 'node:crypto';
 import { promisify } from 'node:util';
 import { db } from './db.js';
 import { PRODUCCION, DIAS_SESION_LARGA, DIAS_SESION_CORTA } from './config.js';
+import { codigoAleatorio } from './utilidades.js';
 
 const scrypt = promisify(crypto.scrypt);
 export const COOKIE = 'qc_sesion';
@@ -80,3 +81,49 @@ export const requiereSesion = (req, res, next) =>
 
 export const requiereAdmin = (req, res, next) =>
   req.usuario?.rol === 'admin' ? next() : res.status(403).json({ error: 'Solo para administradores.' });
+
+/** Facilitadores y administradores. */
+export const requiereFacilitador = (req, res, next) =>
+  ['facilitador', 'admin'].includes(req.usuario?.rol)
+    ? next() : res.status(403).json({ error: 'Solo para facilitadores.' });
+
+/* ---------- Recuperación de contraseña ----------
+ * No hay servidor de correo: un admin o el facilitador de la persona genera un código
+ * de un solo uso y se lo entrega en persona o por WhatsApp. En la BD solo queda su hash.
+ */
+export const HORAS_CODIGO_RECUPERACION = 24;
+const MAX_INTENTOS_RECUPERACION = 5;
+
+/** Crea un código nuevo (anula los anteriores) y lo devuelve en claro con el formato ABCD-EFGH. */
+export function crearCodigoRecuperacion(usuarioId, creadoPor) {
+  const codigo = codigoAleatorio(8);
+  const expira = new Date(Date.now() + HORAS_CODIGO_RECUPERACION * 3_600_000);
+  db.prepare("UPDATE recuperaciones SET usado = datetime('now') WHERE usuario_id = ? AND usado IS NULL").run(usuarioId);
+  db.prepare('INSERT INTO recuperaciones (usuario_id, codigo_hash, creado_por, expira) VALUES (?,?,?,?)')
+    .run(usuarioId, hashToken(codigo), creadoPor, expira.toISOString());
+  return { codigo: `${codigo.slice(0, 4)}-${codigo.slice(4)}`, expira: expira.toISOString() };
+}
+
+/**
+ * Comprueba el código vigente de un usuario. Devuelve true si es correcto (y lo marca como usado).
+ * Tras varios intentos fallidos el código se anula, para que no se pueda adivinar.
+ */
+export function usarCodigoRecuperacion(usuarioId, codigoNormalizado) {
+  const fila = db.prepare(`
+    SELECT id, codigo_hash, intentos FROM recuperaciones
+    WHERE usuario_id = ? AND usado IS NULL AND expira > ? ORDER BY id DESC LIMIT 1`)
+    .get(usuarioId, new Date().toISOString());
+  if (!fila) return false;
+  const a = Buffer.from(hashToken(codigoNormalizado)), b = Buffer.from(fila.codigo_hash);
+  if (a.length === b.length && crypto.timingSafeEqual(a, b)) {
+    db.prepare("UPDATE recuperaciones SET usado = datetime('now') WHERE id = ?").run(fila.id);
+    return true;
+  }
+  const intentos = fila.intentos + 1;
+  db.prepare(`UPDATE recuperaciones SET intentos = ?${intentos >= MAX_INTENTOS_RECUPERACION ? ", usado = datetime('now')" : ''} WHERE id = ?`)
+    .run(intentos, fila.id);
+  return false;
+}
+
+/** Cierra todas las sesiones de un usuario (al restablecer su contraseña). */
+export const cerrarTodasLasSesiones = usuarioId => db.prepare('DELETE FROM sesiones WHERE usuario_id = ?').run(usuarioId);

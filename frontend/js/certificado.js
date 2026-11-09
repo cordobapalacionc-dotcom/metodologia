@@ -16,6 +16,9 @@ async function mostrar(codigo) {
     $('#certCurso').textContent = c.curso_titulo;
     $('#certDetalle').textContent = `${c.lecciones} lecciones · Expedido el ${formatoFecha(c.fecha)}`;
     $('#certCodigo').textContent = c.codigo;
+    $('#certQr').src = `/api/certificados/${encodeURIComponent(c.codigo)}/qr.svg`;
+    $('#certFacilitador').hidden = !c.facilitador;
+    $('#certFacilitador').textContent = c.facilitador ? `Facilitado por ${c.facilitador}` : '';
     $('#certUrl').textContent = url.replace(/^https?:\/\//, '');
     document.title = `Certificado ${c.curso_titulo} · ${c.nombre}`;
     $('#certificado').hidden = false;

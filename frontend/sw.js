@@ -5,7 +5,7 @@
  * - Mapa: las teselas de OpenStreetMap que ya se vieron se guardan (máx. MAX_TESELAS).
  * Cambia VERSION cada vez que publiques cambios en el frontend.
  */
-const VERSION = 'qc-v3';
+const VERSION = 'qc-v4';
 const CACHE_ESTATICO = `${VERSION}-estatico`;
 const CACHE_API = 'qc-api';
 const CACHE_MAPA = 'qc-mapa';
@@ -62,8 +62,8 @@ self.addEventListener('fetch', e => {
   }
 
   if (url.origin !== location.origin) return;
-  if (url.pathname.startsWith('/api/auth') || url.pathname.startsWith('/api/admin') ||
-      url.pathname.endsWith('/exportar') || url.pathname.startsWith('/admin')) return; // siempre en red
+  if (url.pathname.startsWith('/api/auth') || url.pathname.startsWith('/api/admin') || url.pathname.startsWith('/api/facilitador') ||
+      url.pathname.endsWith('/exportar') || url.pathname.startsWith('/admin') || url.pathname.startsWith('/facilitador')) return; // siempre en red
 
   if (url.pathname.startsWith('/api/')) {
     e.respondWith(

@@ -7,6 +7,7 @@ import { requiereSesion, verificarClave, cifrarClave, cerrarOtrasSesiones } from
 import { ErrorHttp, texto, limitador } from '../utilidades.js';
 import { PERFILES } from './auth.js';
 import { analizar, desdeFila } from './diagnosticos.js';
+import { VISIBLE } from '../servicioCursos.js';
 
 const r = Router();
 r.use(requiereSesion);
@@ -27,7 +28,7 @@ r.get('/', (req, res) => {
       (SELECT MAX(p.fecha) FROM progreso p JOIN lecciones l ON l.id = p.leccion_id
         WHERE l.curso_id = c.id AND p.usuario_id = ?) AS ultima,
       (SELECT codigo FROM certificados ce WHERE ce.curso_id = c.id AND ce.usuario_id = ?) AS certificado
-    FROM cursos c ORDER BY c.orden`, id, id, id);
+    FROM cursos c WHERE ${VISIBLE('c')} ORDER BY c.orden`, id, id, id, id, id);
 
   const certificados = todos(
     'SELECT codigo, curso_titulo, fecha FROM certificados WHERE usuario_id = ? ORDER BY fecha DESC', id);

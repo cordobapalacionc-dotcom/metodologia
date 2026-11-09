@@ -2,9 +2,14 @@
  * API del panel de administración. Todas las rutas exigen rol "admin".
  */
 import { Router } from 'express';
-import { db, transaccion } from '../db.js';
-import { requiereSesion, requiereAdmin } from '../autenticacion.js';
-import { ErrorHttp, texto, idParam, coordenadas, textoAHtml, htmlATexto } from '../utilidades.js';
+import { db } from '../db.js';
+import { requiereSesion, requiereAdmin, crearCodigoRecuperacion } from '../autenticacion.js';
+import { ErrorHttp, texto, idParam, coordenadas } from '../utilidades.js';
+import {
+  cursosParaEditor, crearCurso, actualizarCurso, borrarCurso, crearLeccion, actualizarLeccion, borrarLeccion,
+} from '../servicioCursos.js';
+import { listarCopias, crearCopia, rutaCopia } from '../copias.js';
+import { calcularImpacto, impactoCsv } from '../impacto.js';
 import { TIPOS_PUNTO } from './puntos.js';
 
 const r = Router();
@@ -103,112 +108,40 @@ r.delete('/oportunidades/:id', (req, res) => {
 });
 
 /* =================== Cursos y lecciones =================== */
-const NIVELES = ['Principiante', 'Intermedio', 'Avanzado', 'Todos'];
-const ICONOS = ['monitor', 'documento', 'tabla', 'correo', 'escudo', 'libro', 'wifi', 'bombillo', 'maletin', 'grafica'];
-const COLORES = ['', 'rio', 'oro', 'tierra'];
+// Lista todos: los de la plataforma y los de grupo (con su facilitador y código)
+r.get('/cursos', (_req, res) => res.json(cursosParaEditor()));
 
-r.get('/cursos', (_req, res) => {
-  const cursos = db.prepare('SELECT * FROM cursos ORDER BY orden').all();
-  const lecciones = db.prepare('SELECT * FROM lecciones ORDER BY curso_id, orden').all();
-  res.json(cursos.map(c => ({
-    ...c,
-    lecciones: lecciones.filter(l => l.curso_id === c.id).map(l => ({
-      id: l.id, orden: l.orden, titulo: l.titulo, pregunta: l.pregunta,
-      opciones: JSON.parse(l.opciones), respuesta: l.respuesta,
-      texto: l.fuente ?? htmlATexto(l.contenido),
-    })),
-  })));
-});
-
-function datosCurso(b) {
-  const c = {
-    titulo: texto(b.titulo, 80), nivel: b.nivel, publico: texto(b.publico, 120),
-    icono: ICONOS.includes(b.icono) ? b.icono : 'libro',
-    color: COLORES.includes(b.color) ? b.color : '',
-  };
-  if (c.titulo.length < 3) throw new ErrorHttp(400, 'El título del curso es muy corto.');
-  if (!NIVELES.includes(c.nivel)) throw new ErrorHttp(400, 'Nivel no válido.');
-  return c;
-}
-
-const slug = t => t.normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase()
-  .replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '').slice(0, 40) || 'curso';
-
-r.post('/cursos', (req, res) => {
-  const c = datosCurso(req.body ?? {});
-  let id = slug(c.titulo), n = 2;
-  while (db.prepare('SELECT 1 FROM cursos WHERE id = ?').get(id)) id = `${slug(c.titulo)}-${n++}`;
-  const orden = db.prepare('SELECT COALESCE(MAX(orden), -1) + 1 AS o FROM cursos').get().o;
-  db.prepare('INSERT INTO cursos (id, titulo, icono, color, nivel, publico, orden) VALUES (?,?,?,?,?,?,?)')
-    .run(id, c.titulo, c.icono, c.color, c.nivel, c.publico, orden);
-  res.status(201).json({ id });
-});
+r.post('/cursos', (req, res) => res.status(201).json(crearCurso(req.body ?? {})));
 
 r.put('/cursos/:id', (req, res) => {
-  const c = datosCurso(req.body ?? {});
-  const { changes } = db.prepare('UPDATE cursos SET titulo=?, icono=?, color=?, nivel=?, publico=? WHERE id=?')
-    .run(c.titulo, c.icono, c.color, c.nivel, c.publico, req.params.id);
-  if (!changes) throw new ErrorHttp(404, 'Curso no encontrado.');
+  actualizarCurso(req.params.id, req.body ?? {});
   res.json({ ok: true });
 });
 
 r.delete('/cursos/:id', (req, res) => {
-  db.prepare('DELETE FROM cursos WHERE id = ?').run(req.params.id); // borra sus lecciones y avance (cascada)
+  borrarCurso(req.params.id);
   res.json({ ok: true });
 });
-
-function datosLeccion(b) {
-  const l = {
-    titulo: texto(b.titulo, 120),
-    texto: typeof b.texto === 'string' ? b.texto.trim().slice(0, 5000) : '',
-    pregunta: texto(b.pregunta, 300),
-    opciones: Array.isArray(b.opciones) ? b.opciones.map(o => texto(o, 150)).filter(Boolean) : [],
-    respuesta: Number(b.respuesta),
-  };
-  if (l.titulo.length < 3) throw new ErrorHttp(400, 'El título de la lección es muy corto.');
-  if (l.texto.length < 10) throw new ErrorHttp(400, 'Escribe el contenido de la lección.');
-  if (l.pregunta.length < 5) throw new ErrorHttp(400, 'Escribe la pregunta de comprobación.');
-  if (l.opciones.length < 2 || l.opciones.length > 5) throw new ErrorHttp(400, 'La pregunta debe tener entre 2 y 5 opciones.');
-  if (!Number.isInteger(l.respuesta) || l.respuesta < 0 || l.respuesta >= l.opciones.length)
-    throw new ErrorHttp(400, 'Marca cuál opción es la correcta.');
-  return l;
-}
 
 r.post('/cursos/:id/lecciones', (req, res) => {
   const curso = db.prepare('SELECT id FROM cursos WHERE id = ?').get(req.params.id);
   if (!curso) throw new ErrorHttp(404, 'Curso no encontrado.');
-  const l = datosLeccion(req.body ?? {});
-  const orden = db.prepare('SELECT COALESCE(MAX(orden), -1) + 1 AS o FROM lecciones WHERE curso_id = ?').get(curso.id).o;
-  const { lastInsertRowid } = db.prepare(`
-    INSERT INTO lecciones (curso_id, orden, titulo, contenido, fuente, pregunta, opciones, respuesta) VALUES (?,?,?,?,?,?,?,?)`)
-    .run(curso.id, orden, l.titulo, textoAHtml(l.texto), l.texto, l.pregunta, JSON.stringify(l.opciones), l.respuesta);
-  res.status(201).json({ id: Number(lastInsertRowid) });
+  res.status(201).json({ id: crearLeccion(curso.id, req.body ?? {}) });
 });
 
 r.put('/lecciones/:id', (req, res) => {
-  const l = datosLeccion(req.body ?? {});
-  const { changes } = db.prepare(`
-    UPDATE lecciones SET titulo=?, contenido=?, fuente=?, pregunta=?, opciones=?, respuesta=? WHERE id=?`)
-    .run(l.titulo, textoAHtml(l.texto), l.texto, l.pregunta, JSON.stringify(l.opciones), l.respuesta, idParam(req.params.id));
-  if (!changes) throw new ErrorHttp(404, 'Lección no encontrada.');
+  actualizarLeccion(req.params.id, req.body ?? {});
   res.json({ ok: true });
 });
 
 r.delete('/lecciones/:id', (req, res) => {
-  const id = idParam(req.params.id);
-  transaccion(() => {
-    const l = db.prepare('SELECT curso_id, orden FROM lecciones WHERE id = ?').get(id);
-    if (!l) return;
-    db.prepare('DELETE FROM lecciones WHERE id = ?').run(id);
-    // Reordenar las siguientes para no dejar huecos
-    const siguientes = db.prepare('SELECT id FROM lecciones WHERE curso_id = ? AND orden > ? ORDER BY orden').all(l.curso_id, l.orden);
-    const mover = db.prepare('UPDATE lecciones SET orden = ? WHERE id = ?');
-    siguientes.forEach((s, i) => mover.run(l.orden + i, s.id));
-  });
+  borrarLeccion(idParam(req.params.id));
   res.json({ ok: true });
 });
 
 /* =================== Usuarios =================== */
+const ROLES = ['usuario', 'facilitador', 'admin'];
+
 r.get('/usuarios', (_req, res) => {
   res.json(db.prepare(`
     SELECT u.id, u.nombre, u.correo, u.perfil, u.barrio, u.rol, u.creado,
@@ -220,11 +153,40 @@ r.get('/usuarios', (_req, res) => {
 r.put('/usuarios/:id/rol', (req, res) => {
   const id = idParam(req.params.id);
   const rol = req.body?.rol;
-  if (!['usuario', 'admin'].includes(rol)) throw new ErrorHttp(400, 'Rol no válido.');
+  if (!ROLES.includes(rol)) throw new ErrorHttp(400, 'Rol no válido.');
   if (id === req.usuario.id) throw new ErrorHttp(400, 'No puedes cambiar tu propio rol.');
   const { changes } = db.prepare('UPDATE usuarios SET rol = ? WHERE id = ?').run(rol, id);
   if (!changes) throw new ErrorHttp(404, 'Usuario no encontrado.');
   res.json({ ok: true });
+});
+
+/** POST /api/admin/usuarios/:id/recuperacion — código para que la persona cree una contraseña nueva */
+r.post('/usuarios/:id/recuperacion', (req, res) => {
+  const id = idParam(req.params.id);
+  if (id === req.usuario.id) throw new ErrorHttp(400, 'Para cambiar tu propia contraseña usa Mi panel.');
+  const u = db.prepare('SELECT nombre, correo FROM usuarios WHERE id = ?').get(id);
+  if (!u) throw new ErrorHttp(404, 'Usuario no encontrado.');
+  res.status(201).json({ ...u, ...crearCodigoRecuperacion(id, req.usuario.id) });
+});
+
+/* =================== Tablero de impacto =================== */
+r.get('/impacto', (_req, res) => res.json(calcularImpacto()));
+
+r.get('/impacto.csv', (_req, res) => {
+  const fecha = new Date().toISOString().slice(0, 10);
+  res.attachment(`impacto-quibdo-conecta-${fecha}.csv`).type('text/csv; charset=utf-8').send('﻿' + impactoCsv(calcularImpacto()));
+});
+
+/* =================== Copias de seguridad =================== */
+r.get('/copias', (_req, res) => res.json(listarCopias()));
+
+r.post('/copias', (_req, res) => res.status(201).json(crearCopia(true)));
+
+/** Descarga de una copia: contiene datos personales, por eso solo la ven los admins. */
+r.get('/copias/:nombre', (req, res) => {
+  const ruta = rutaCopia(req.params.nombre);
+  if (!ruta) throw new ErrorHttp(404, 'Copia no encontrada.');
+  res.download(ruta, req.params.nombre);
 });
 
 export default r;

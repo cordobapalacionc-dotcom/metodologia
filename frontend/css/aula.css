@@ -19,3 +19,10 @@
 .opciones label:has(input:checked){border-color:var(--selva-2);background:#eef7f1}
 .opciones input{accent-color:var(--selva-2)}
 #retro{min-height:1.5em}
+
+/* Unirse a un curso de grupo con código */
+.unirse{margin:0 0 16px;padding:14px 16px}
+.unirse label.t{display:flex;gap:8px;align-items:center}
+.unirse input{max-width:200px;text-transform:uppercase;letter-spacing:.1em;font-family:ui-monospace,Consolas,monospace}
+.unirse .msg-error{color:var(--error);font-size:.88rem;margin:6px 0 0;min-height:0}
+.card.grupo{border-color:#b5dfeb;border-top:4px solid var(--rio)}

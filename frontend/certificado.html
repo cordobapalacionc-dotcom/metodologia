@@ -48,16 +48,21 @@
         <p class="cert-texto">por haber completado satisfactoriamente el curso</p>
         <h2 class="cert-curso" id="certCurso"></h2>
         <p class="cert-texto" id="certDetalle"></p>
+        <p class="cert-texto" id="certFacilitador" hidden></p>
 
         <footer class="cert-pie">
           <div>
             <span class="cert-linea"></span>
             <small>Quibdó Conecta</small>
           </div>
-          <div class="cert-codigo">
-            <small>Código de verificación</small>
-            <b id="certCodigo"></b>
-            <small id="certUrl"></small>
+          <div class="cert-verificacion">
+            <div class="cert-codigo">
+              <small>Código de verificación</small>
+              <b id="certCodigo"></b>
+              <small id="certUrl"></small>
+              <small class="cert-escanea">Escanea el código QR para comprobar que es auténtico</small>
+            </div>
+            <img class="cert-qr" id="certQr" alt="Código QR para verificar este certificado" width="104" height="104">
           </div>
         </footer>
         <p class="cert-nota">Certificado de participación en formación libre. No equivale a un título académico oficial.</p>
