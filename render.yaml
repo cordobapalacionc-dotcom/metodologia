@@ -32,3 +32,5 @@ services:
     # (y agrega en envVars:)
     # - key: RUTA_DB
     #   value: /var/data/quibdo.db
+    # - key: RUTA_COPIAS
+    #   value: /var/data/copias

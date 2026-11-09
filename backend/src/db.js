@@ -14,17 +14,19 @@ const columnas = tabla => db.prepare(`PRAGMA table_info(${tabla})`).all().map(c 
 // Migración: el mapa pasó de coordenadas x/y (esquema) a latitud/longitud reales
 if (columnas('puntos').includes('x')) db.exec('DROP TABLE puntos');
 
-db.exec(`
-CREATE TABLE IF NOT EXISTS usuarios (
+const TABLA_USUARIOS = `CREATE TABLE IF NOT EXISTS usuarios (
   id          INTEGER PRIMARY KEY AUTOINCREMENT,
   nombre      TEXT NOT NULL,
   correo      TEXT NOT NULL UNIQUE,
   perfil      TEXT NOT NULL,
   barrio      TEXT,
   clave_hash  TEXT NOT NULL,
-  rol         TEXT NOT NULL DEFAULT 'usuario' CHECK (rol IN ('usuario','admin')),
+  rol         TEXT NOT NULL DEFAULT 'usuario' CHECK (rol IN ('usuario','facilitador','admin')),
   creado      TEXT NOT NULL DEFAULT (datetime('now'))
-);
+)`;
+
+db.exec(`
+${TABLA_USUARIOS};
 
 CREATE TABLE IF NOT EXISTS sesiones (
   token_hash  TEXT PRIMARY KEY,
@@ -39,7 +41,9 @@ CREATE TABLE IF NOT EXISTS cursos (
   color    TEXT,
   nivel    TEXT,
   publico  TEXT,
-  orden    INTEGER
+  orden    INTEGER,
+  autor_id       INTEGER REFERENCES usuarios(id) ON DELETE SET NULL,  -- facilitador que lo creó (NULL = curso de la plataforma)
+  codigo_acceso  TEXT          -- NULL = abierto a todos · con código = curso privado de un grupo
 );
 
 CREATE TABLE IF NOT EXISTS lecciones (
@@ -132,12 +136,60 @@ CREATE TABLE IF NOT EXISTS certificados (
   curso_titulo  TEXT NOT NULL,
   lecciones     INTEGER NOT NULL,
   fecha         TEXT NOT NULL DEFAULT (datetime('now')),
+  facilitador   TEXT,          -- nombre de quien dictó el curso (cursos de grupo)
   UNIQUE (usuario_id, curso_id)
+);
+
+-- Estudiantes inscritos en los cursos privados de un facilitador
+CREATE TABLE IF NOT EXISTS inscripciones (
+  usuario_id  INTEGER NOT NULL REFERENCES usuarios(id) ON DELETE CASCADE,
+  curso_id    TEXT NOT NULL REFERENCES cursos(id) ON DELETE CASCADE,
+  fecha       TEXT NOT NULL DEFAULT (datetime('now')),
+  PRIMARY KEY (usuario_id, curso_id)
+);
+
+-- Códigos de recuperación de contraseña (los entrega un admin o el facilitador; en la BD solo va su hash)
+CREATE TABLE IF NOT EXISTS recuperaciones (
+  id           INTEGER PRIMARY KEY AUTOINCREMENT,
+  usuario_id   INTEGER NOT NULL REFERENCES usuarios(id) ON DELETE CASCADE,
+  codigo_hash  TEXT NOT NULL,
+  creado_por   INTEGER REFERENCES usuarios(id) ON DELETE SET NULL,
+  creado       TEXT NOT NULL DEFAULT (datetime('now')),
+  expira       TEXT NOT NULL,
+  intentos     INTEGER NOT NULL DEFAULT 0,
+  usado        TEXT
 );
 `);
 
-// Migración: columna "fuente" en bases creadas con la versión anterior
+// Migraciones para bases creadas con versiones anteriores
 if (!columnas('lecciones').includes('fuente')) db.exec('ALTER TABLE lecciones ADD COLUMN fuente TEXT');
+if (!columnas('cursos').includes('autor_id'))
+  db.exec('ALTER TABLE cursos ADD COLUMN autor_id INTEGER REFERENCES usuarios(id) ON DELETE SET NULL');
+if (!columnas('cursos').includes('codigo_acceso')) db.exec('ALTER TABLE cursos ADD COLUMN codigo_acceso TEXT');
+if (!columnas('certificados').includes('facilitador')) db.exec('ALTER TABLE certificados ADD COLUMN facilitador TEXT');
+db.exec('CREATE UNIQUE INDEX IF NOT EXISTS cursos_codigo ON cursos(codigo_acceso)');
+
+// El rol "facilitador" no cabía en la restricción CHECK anterior. SQLite no permite cambiar un CHECK,
+// así que se reconstruye la tabla siguiendo el procedimiento oficial de SQLite.
+const sqlUsuarios = db.prepare("SELECT sql FROM sqlite_master WHERE type = 'table' AND name = 'usuarios'").get().sql;
+if (!sqlUsuarios.includes("'facilitador'")) {
+  db.exec('PRAGMA foreign_keys = OFF');
+  db.exec('BEGIN');
+  try {
+    db.exec(TABLA_USUARIOS.replace('IF NOT EXISTS usuarios', 'usuarios_nueva'));
+    db.exec('INSERT INTO usuarios_nueva (id, nombre, correo, perfil, barrio, clave_hash, rol, creado) ' +
+            'SELECT id, nombre, correo, perfil, barrio, clave_hash, rol, creado FROM usuarios');
+    db.exec('DROP TABLE usuarios');
+    db.exec('ALTER TABLE usuarios_nueva RENAME TO usuarios');
+    if (db.prepare('PRAGMA foreign_key_check').all().length) throw new Error('Migración de usuarios: llaves foráneas rotas.');
+    db.exec('COMMIT');
+  } catch (e) {
+    db.exec('ROLLBACK');
+    throw e;
+  } finally {
+    db.exec('PRAGMA foreign_keys = ON');
+  }
+}
 
 /** Ejecuta fn dentro de una transacción. */
 export function transaccion(fn) {

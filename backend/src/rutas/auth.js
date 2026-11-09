@@ -1,7 +1,10 @@
 import { Router } from 'express';
 import { db } from '../db.js';
-import { cifrarClave, verificarClave, crearSesion, cerrarSesion, requiereSesion } from '../autenticacion.js';
-import { ErrorHttp, texto, correoValido, limitador } from '../utilidades.js';
+import {
+  cifrarClave, verificarClave, crearSesion, cerrarSesion, requiereSesion,
+  usarCodigoRecuperacion, cerrarTodasLasSesiones,
+} from '../autenticacion.js';
+import { ErrorHttp, texto, correoValido, limitador, normalizarCodigo } from '../utilidades.js';
 import { ADMIN_CORREOS } from '../config.js';
 
 const r = Router();
@@ -51,6 +54,29 @@ r.post('/login', limiteAcceso, async (req, res) => {
   if (!u || !ok) throw new ErrorHttp(401, 'Correo o contraseña incorrectos.');
 
   crearSesion(res, u.id, req.body.recordar !== false);
+  res.json({ usuario: publico(u) });
+});
+
+/**
+ * POST /api/auth/recuperar { correo, codigo, clave }
+ * Restablece la contraseña con el código que entregó un admin o el facilitador.
+ * Cierra todas las sesiones abiertas de esa cuenta e inicia una nueva.
+ */
+r.post('/recuperar', limitador({ ventanaMin: 15, max: 10 }), async (req, res) => {
+  const correo = texto(req.body?.correo, 120).toLowerCase();
+  const codigo = normalizarCodigo(req.body?.codigo);
+  const clave = typeof req.body?.clave === 'string' ? req.body.clave : '';
+  if (!correo || codigo.length !== 8) throw new ErrorHttp(400, 'Escribe tu correo y el código de 8 caracteres que te entregaron.');
+  if (clave.length < 6 || clave.length > 128) throw new ErrorHttp(400, 'La nueva contraseña debe tener entre 6 y 128 caracteres.');
+
+  const u = db.prepare('SELECT * FROM usuarios WHERE correo = ?').get(correo);
+  // Mismo mensaje si el correo no existe: no se revela qué cuentas hay
+  if (!u || !usarCodigoRecuperacion(u.id, codigo))
+    throw new ErrorHttp(400, 'El código no es válido o ya venció. Pide uno nuevo a tu facilitador o al administrador.');
+
+  db.prepare('UPDATE usuarios SET clave_hash = ? WHERE id = ?').run(await cifrarClave(clave), u.id);
+  cerrarTodasLasSesiones(u.id);
+  crearSesion(res, u.id, false);
   res.json({ usuario: publico(u) });
 });
 

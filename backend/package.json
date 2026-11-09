@@ -8,13 +8,16 @@
   "scripts": {
     "start": "node src/server.js",
     "dev": "node --watch src/server.js",
-    "admin": "node scripts/crear-admin.js"
+    "admin": "node scripts/crear-admin.js",
+    "copia": "node scripts/copia.js",
+    "restaurar": "node scripts/restaurar.js"
   },
   "engines": {
     "node": ">=22.13"
   },
   "dependencies": {
     "express": "^5.1.0",
-    "leaflet": "^1.9.4"
+    "leaflet": "^1.9.4",
+    "qrcode": "^1.5.4"
   }
 }

@@ -22,9 +22,10 @@ async function mostrarLista() {
       const pct = Math.round(c.completadas / c.total * 100);
       const accion = pct === 100 ? 'Repasar' : pct > 0 ? 'Continuar' : 'Empezar';
       return `
-        <article class="card card-flex">
+        <article class="card card-flex ${c.grupo ? 'grupo' : ''}">
           <div class="ico-caja ${c.color}">${ico(c.icono, 'ico-grande')}</div>
           <h3>${esc(c.titulo)}</h3>
+          ${c.grupo ? `<div><span class="etiqueta rio">${ico('usuarios')} Curso de grupo${c.facilitador ? ` · ${esc(c.facilitador)}` : ''}</span></div>` : ''}
           <div><span class="etiqueta">${esc(c.nivel)}</span><span class="etiqueta rio">${ico('libro')} ${c.total} lecciones</span></div>
           <p>${esc(c.publico)}</p>
           <div class="barra" role="progressbar" aria-valuenow="${pct}" aria-valuemin="0" aria-valuemax="100" aria-label="Avance"><span style="width:${pct}%"></span></div>
@@ -150,9 +151,49 @@ vista.addEventListener('click', e => {
   if (accion === 'certificado') obtenerCertificado(curso.id, e.target.closest('button'));
 });
 
-/* ---------- Navegación con la URL (/aula?curso=word) ---------- */
+/* ---------- Unirse a un curso de grupo con el código del facilitador ---------- */
+async function unirse(codigo) {
+  const err = $('#errUnirse');
+  err.textContent = '';
+  if (!usuario) {
+    err.innerHTML = `${ico('usuario')} Para unirte a un curso necesitas una cuenta.
+      <a href="/?registro&unirse=${encodeURIComponent(codigo)}">Crea una gratis</a> o <a href="/?unirse=${encodeURIComponent(codigo)}">inicia sesión</a>.`;
+    return;
+  }
+  const boton = $('#formUnirse button');
+  boton.disabled = true;
+  try {
+    const c = await api('/cursos/unirse', { metodo: 'POST', datos: { codigo } });
+    toast(c.nuevo ? `Te uniste al curso “${c.titulo}”.` : `Ya estabas en el curso “${c.titulo}”.`);
+    $('#codigoCurso').value = '';
+    history.pushState({}, '', `?curso=${encodeURIComponent(c.id)}`);
+    abrirCurso(c.id);
+  } catch (e) {
+    err.innerHTML = `${ico('alerta')} ${esc(e.message)}`;
+  } finally {
+    boton.disabled = false;
+  }
+}
+
+$('#formUnirse').addEventListener('submit', e => {
+  e.preventDefault();
+  const codigo = $('#codigoCurso').value.trim();
+  if (!codigo) { $('#errUnirse').textContent = 'Escribe el código que te dio tu facilitador.'; return; }
+  unirse(codigo);
+});
+
+/* ---------- Navegación con la URL (/aula?curso=word · /aula?unirse=K7P2QX) ---------- */
 function segunUrl() {
-  const id = new URLSearchParams(location.search).get('curso');
+  const params = new URLSearchParams(location.search);
+  const codigo = params.get('unirse');
+  if (codigo) {
+    history.replaceState({}, '', location.pathname);
+    mostrarLista();
+    $('#codigoCurso').value = codigo;
+    unirse(codigo);
+    return;
+  }
+  const id = params.get('curso');
   id ? abrirCurso(id) : mostrarLista();
 }
 addEventListener('popstate', segunUrl);

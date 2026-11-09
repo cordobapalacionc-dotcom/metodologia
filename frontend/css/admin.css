@@ -51,3 +51,93 @@ textarea{min-height:180px;resize:vertical;font-family:inherit}
 @media (max-width:640px){
   .fila-admin{flex-direction:column}
 }
+
+/* =========================================================
+   Compartido con el panel del facilitador
+   ========================================================= */
+.select-mini{width:auto;padding:5px 8px;font-size:.85rem}
+.celda-rol{display:flex;gap:6px;align-items:center}
+#tablaUsuarios td:nth-child(-n+2){white-space:normal;overflow-wrap:anywhere;min-width:120px}
+.info-grupo{margin:10px 0 0;font-size:.88rem;color:var(--suave);display:flex;flex-wrap:wrap;gap:4px;align-items:center}
+code{font-family:ui-monospace,Consolas,monospace;background:#eef3ee;padding:1px 6px;border-radius:6px;font-size:.92em}
+.codigo-grande{font-family:ui-monospace,Consolas,monospace;font-size:2rem;font-weight:800;letter-spacing:.12em;text-align:center;
+  color:var(--selva);background:#f7faf6;border:2px dashed var(--selva-2);border-radius:12px;padding:12px;margin:10px 0;user-select:all}
+.pasos-texto{padding-left:20px;margin:8px 0}
+.vacio-mini{color:var(--suave);font-size:.9rem;margin:6px 0}
+
+/* =========================================================
+   Copias de seguridad
+   ========================================================= */
+.ayuda-restaurar{margin-top:14px}
+.ayuda-restaurar summary{cursor:pointer;font-weight:600;display:flex;gap:8px;align-items:center}
+.ayuda-restaurar ol{margin:10px 0 0;padding-left:20px}
+.ayuda-restaurar li{margin-bottom:6px}
+
+/* =========================================================
+   Tablero de impacto
+   ========================================================= */
+.generado{color:var(--suave);font-size:.85rem;margin:0 0 12px}
+.titulo-impreso{display:none}
+.cifras-impacto{display:grid;gap:12px;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));margin-bottom:22px}
+.cifra-impacto{display:flex;flex-direction:column;gap:2px}
+.cifra-impacto .cifra-ico{color:var(--selva-2)}
+.cifra-impacto b{font-size:2rem;line-height:1.1;color:var(--texto);font-variant-numeric:tabular-nums}
+.cifra-impacto span{color:var(--texto);font-size:.9rem}
+.cifra-impacto small{color:var(--suave);font-size:.78rem;margin-top:4px}
+.subtitulo-impacto{display:flex;gap:8px;align-items:center;color:var(--selva);margin:8px 0 10px}
+
+/* Columnas por mes: una serie por gráfica, cada una con su propia escala */
+.grid-meses{display:grid;gap:12px;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));margin-bottom:16px}
+.grafica-meses{margin:0}
+.grafica-meses figcaption{display:flex;justify-content:space-between;align-items:baseline;gap:8px;margin-bottom:10px}
+.grafica-meses figcaption span{color:var(--suave);font-size:.8rem}
+.columnas{display:grid;grid-template-columns:repeat(12,1fr);gap:2px;height:110px;align-items:end;border-bottom:1px solid var(--borde)}
+.col{height:100%;display:flex;align-items:flex-end;position:relative;cursor:default;border-radius:4px 4px 0 0}
+.col:focus-visible{outline-offset:0}
+.col-barra{display:block;width:100%;background:var(--selva-2);border-radius:4px 4px 0 0;min-height:0}
+.col:hover .col-barra,.col:focus .col-barra{background:var(--selva)}
+.col:hover::after,.col:focus::after{content:attr(data-tip);position:absolute;bottom:calc(100% + 4px);left:50%;transform:translateX(-50%);
+  background:#1d2a22;color:#fff;font-size:.75rem;padding:4px 8px;border-radius:6px;white-space:nowrap;z-index:5;pointer-events:none}
+.col:first-child:hover::after,.col:first-child:focus::after{left:0;transform:none}
+.col:last-child:hover::after,.col:last-child:focus::after{left:auto;right:0;transform:none}
+.columnas-eje{display:grid;grid-template-columns:repeat(12,1fr);gap:2px;font-size:.66rem;color:var(--suave);margin-top:4px}
+.columnas-eje span{white-space:nowrap;overflow:visible}
+.ver-datos{margin-top:8px;font-size:.82rem}
+.ver-datos summary{cursor:pointer;color:var(--selva-2)}
+.tabla-mini{margin-top:6px;font-size:.82rem}
+.tabla-mini th,.tabla-mini td{padding:4px 8px}
+
+/* Barras horizontales con el valor escrito */
+.grid-impacto{display:grid;gap:12px;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));margin-bottom:12px}
+.bloque-impacto{margin-bottom:12px}
+.grid-impacto .bloque-impacto{margin-bottom:0}
+.bloque-impacto h3{color:var(--selva)}
+.bloque-impacto .explica{font-size:.82rem;margin:0 0 10px}
+.barras{display:grid;gap:8px}
+.fila-barra{display:grid;grid-template-columns:minmax(90px,34%) 1fr auto;column-gap:10px;align-items:center;font-size:.88rem}
+.barra-nombre{overflow-wrap:anywhere;line-height:1.25}
+.barra-pista{height:12px;background:#eef2ec;border-radius:0 4px 4px 0}
+.barra-relleno{display:block;height:100%;background:var(--selva-2);border-radius:0 4px 4px 0}
+.fila-barra:hover .barra-relleno{background:var(--selva)}
+.barra-valor{font-weight:700;font-variant-numeric:tabular-nums;min-width:2.5ch;text-align:right}
+.barra-detalle{grid-column:2 / -1;font-size:.76rem;color:var(--suave);margin-top:-2px}
+.cifras-mini{display:flex;flex-wrap:wrap;gap:24px}
+.cifras-mini b{display:block;font-size:1.6rem;line-height:1.1}
+.cifras-mini span{color:var(--suave);font-size:.85rem}
+.nota-impacto{font-size:.78rem;color:var(--suave);margin-top:14px}
+
+@media (max-width:640px){
+  .fila-barra{grid-template-columns:1fr auto}
+  .barra-nombre{grid-column:1 / -1}
+  .barra-pista{grid-column:1}
+  .barra-detalle{grid-column:1 / -1}
+}
+
+/* Impresión del informe de impacto */
+@media print{
+  .tabs-admin,.titulo-pagina,.cabecera-tab,footer,.ver-datos,[role=tabpanel]:not(#tab-impacto){display:none !important}
+  .titulo-impreso{display:block;font-size:1.4rem;font-weight:800;color:var(--selva);margin-bottom:4px}
+  main{padding:0}
+  .card{box-shadow:none;break-inside:avoid}
+  .barra-relleno,.col-barra,.barra-pista{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+}

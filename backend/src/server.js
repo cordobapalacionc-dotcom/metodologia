@@ -14,6 +14,8 @@ import rutasDiagnosticos from './rutas/diagnosticos.js';
 import rutasCertificados from './rutas/certificados.js';
 import rutasAdmin from './rutas/admin.js';
 import rutasPerfil from './rutas/perfil.js';
+import rutasFacilitador from './rutas/facilitador.js';
+import { iniciarCopiasAutomaticas } from './copias.js';
 
 const require = createRequire(import.meta.url);
 const CARPETA_LEAFLET = path.dirname(require.resolve('leaflet/dist/leaflet.js'));
@@ -52,6 +54,7 @@ app.use('/api/diagnosticos', rutasDiagnosticos);
 app.use('/api/certificados', rutasCertificados);
 app.use('/api/admin', rutasAdmin);
 app.use('/api/perfil', rutasPerfil);
+app.use('/api/facilitador', rutasFacilitador);
 app.use('/api', (_req, res) => res.status(404).json({ error: 'Ruta no encontrada.' }));
 
 /* ---------- Librerías del frontend ---------- */
@@ -66,4 +69,5 @@ app.use(manejadorErrores);
 
 app.listen(PUERTO, () => {
   console.log(`\n  Quibdó Conecta funcionando en  http://localhost:${PUERTO}\n`);
+  iniciarCopiasAutomaticas();
 });

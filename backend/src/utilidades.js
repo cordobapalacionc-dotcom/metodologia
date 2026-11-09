@@ -1,3 +1,5 @@
+import crypto from 'node:crypto';
+
 /** Error con código HTTP que el manejador central convierte en respuesta JSON. */
 export class ErrorHttp extends Error {
   constructor(estado, mensaje) {
@@ -92,3 +94,17 @@ export function manejadorErrores(err, req, res, _next) {
   console.error(err);
   res.status(500).json({ error: 'Error interno del servidor.' });
 }
+
+/* ---------- Códigos legibles ---------- */
+/** Alfabeto sin letras que se confunden al dictarlas o copiarlas (0/O, 1/I/L). */
+const ALFABETO = 'ABCDEFGHJKMNPQRSTUVWXYZ23456789';
+
+/** Código aleatorio de n caracteres, p. ej. "K7P2QX". */
+export function codigoAleatorio(n) {
+  let c = '';
+  while (c.length < n) c += ALFABETO[crypto.randomInt(ALFABETO.length)];
+  return c;
+}
+
+/** Normaliza un código escrito por una persona: mayúsculas, sin espacios ni guiones. */
+export const normalizarCodigo = v => texto(v, 40).toUpperCase().replace(/[\s-]/g, '');

@@ -76,7 +76,9 @@ async function cerrarSesion() {
 export async function iniciarPagina() {
   const usuario = await obtenerUsuario();
   if (!usuario && !sessionStorage.getItem('qc_invitado')) {
-    location.replace('/');
+    // Conservar la invitación a un curso para retomarla después de entrar
+    const unirse = new URLSearchParams(location.search).get('unirse');
+    location.replace(unirse ? `/?unirse=${encodeURIComponent(unirse)}` : '/');
     return new Promise(() => {}); // detiene la página mientras redirige
   }
   pintarCabecera(usuario);
@@ -112,6 +114,9 @@ function pintarCabecera(usuario) {
                  <div class="avatar" aria-hidden="true">${esc(iniciales)}</div>
                  <div class="usuario-nombre">${esc(nombre)}<small>Mi panel</small></div>
                </a>
+               ${['facilitador', 'admin'].includes(usuario.rol)
+                 ? `<a class="btn-cabecera ${actual === 'facilitador' ? 'activo' : ''}" href="/facilitador" title="Mis grupos: cursos para mis estudiantes">${ico('usuarios')}<span class="estado-texto">Mis grupos</span></a>`
+                 : ''}
                ${usuario.rol === 'admin'
                  ? `<a class="btn-cabecera ${actual === 'admin' ? 'activo' : ''}" href="/admin" title="Panel de administración">${ico('escudo')}<span class="estado-texto">Admin</span></a>`
                  : ''}

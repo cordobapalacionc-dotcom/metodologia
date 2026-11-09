@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Mis grupos · Quibdó Conecta</title>
+  <meta name="theme-color" content="#0f5132">
+  <meta name="robots" content="noindex">
+  <link rel="icon" href="/img/logo.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="/css/base.css">
+  <link rel="stylesheet" href="/css/admin.css">
+  <link rel="stylesheet" href="/css/facilitador.css">
+  <script type="module" src="/js/facilitador.js"></script>
+</head>
+<body data-pagina="facilitador">
+  <a class="saltar" href="#contenido">Saltar al contenido</a>
+  <header id="cabecera" class="cabecera"></header>
+
+  <main id="contenido">
+    <div class="titulo-pagina">
+      <div class="ico-caja rio"><svg class="ico ico-grande" aria-hidden="true"><use href="/img/iconos.svg#i-usuarios"/></svg></div>
+      <h2>Mis grupos</h2>
+    </div>
+
+    <div id="panel" hidden>
+      <p class="intro">Crea cursos para tus estudiantes. Cada curso tiene un <b>código de invitación</b>: compártelo y
+        tus estudiantes lo escriben en el Aula virtual para unirse. Solo ellos verán el curso.</p>
+
+      <nav class="tabs-admin" role="tablist" aria-label="Secciones">
+        <button role="tab" data-tab="cursos"><svg class="ico" aria-hidden="true"><use href="/img/iconos.svg#i-libro"/></svg> Mis cursos</button>
+        <button role="tab" data-tab="estudiantes"><svg class="ico" aria-hidden="true"><use href="/img/iconos.svg#i-usuarios"/></svg> Estudiantes</button>
+      </nav>
+
+      <section id="tab-cursos" role="tabpanel" hidden>
+        <div class="cabecera-tab">
+          <p class="intro">Escribe las lecciones en texto sencillo. Cada una termina con una pregunta para comprobar lo aprendido.</p>
+          <button class="btn" id="btnNuevoCurso"><svg class="ico" aria-hidden="true"><use href="/img/iconos.svg#i-libro"/></svg> Nuevo curso</button>
+        </div>
+        <div id="listaCursos"></div>
+      </section>
+
+      <section id="tab-estudiantes" role="tabpanel" hidden>
+        <div class="campo selector-curso">
+          <label class="t" for="cursoEstudiantes">Curso</label>
+          <select id="cursoEstudiantes"></select>
+        </div>
+        <div id="resumenEstudiantes"></div>
+        <div class="tabla-scroll"><table class="tabla" id="tablaEstudiantes"></table></div>
+        <p class="ayuda">Si alguien de tu grupo olvidó su contraseña, toca <b>Código</b> y entrégale el código que aparece.</p>
+      </section>
+    </div>
+  </main>
+
+  <!-- Ventana para crear / editar -->
+  <dialog id="dialogo" aria-labelledby="dialogoTitulo">
+    <form id="dialogoForm" novalidate>
+      <header class="dialogo-cabecera">
+        <h3 id="dialogoTitulo"></h3>
+        <button type="button" class="btn-icono" data-cerrar aria-label="Cerrar"><svg class="ico" aria-hidden="true"><use href="/img/iconos.svg#i-cerrar"/></svg></button>
+      </header>
+      <div id="dialogoCuerpo" class="dialogo-cuerpo"></div>
+      <p class="msg-error" id="dialogoError" role="alert"></p>
+      <footer class="acciones dialogo-pie">
+        <button type="button" class="btn fantasma" data-cerrar>Cancelar</button>
+        <button type="submit" class="btn"><svg class="ico" aria-hidden="true"><use href="/img/iconos.svg#i-check"/></svg> Guardar</button>
+      </footer>
+    </form>
+  </dialog>
+
+  <footer>Quibdó Conecta · Panel del facilitador</footer>
+</body>
+</html>
