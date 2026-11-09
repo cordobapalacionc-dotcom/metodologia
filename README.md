@@ -12,6 +12,7 @@ Quibdó Conecta reúne en un solo lugar formación digital básica, información
 - [Funcionalidades](#funcionalidades)
 - [Tecnologías](#tecnologías)
 - [Instalación y ejecución](#instalación-y-ejecución)
+- [Despliegue en Render](#despliegue-en-render)
 - [Primer administrador](#primer-administrador)
 - [Estructura del proyecto](#estructura-del-proyecto)
 - [API](#api)
@@ -103,6 +104,20 @@ Variables de entorno opcionales:
 | `PORT` | `3000` | Puerto del servidor. |
 | `RUTA_DB` | `backend/datos/quibdo.db` | Ubicación del archivo de base de datos. |
 | `NODE_ENV` | — | Con `production`, la cookie de sesión solo viaja por HTTPS. |
+| `ADMIN_CORREOS` | — | Correos (separados por comas) que quedan como administradores. |
+| `TRUST_PROXY` | — | Con `1`, usa la IP real detrás de un proxy (en Render se activa sola). |
+
+## Despliegue en Render
+
+El repositorio incluye un Blueprint (`render.yaml`) que crea un servicio web con Node.js. El mismo servidor Express sirve la API y el frontend.
+
+1. Abrir: **https://dashboard.render.com/blueprint/new?repo=https://github.com/cordobapalacionc-dotcom/metodologia**
+2. Conectar la cuenta de GitHub si Render lo pide.
+3. Escribir en `ADMIN_CORREOS` el correo de la persona administradora (varios, separados por comas).
+4. Pulsar **Apply**. Al terminar, la plataforma queda en `https://quibdo-conecta.onrender.com` (o un nombre parecido).
+5. Registrarse con ese correo: la cuenta queda como administradora de una vez (no hace falta terminal).
+
+> **Ojo con el plan gratuito:** el disco es temporal, así que la base SQLite se borra en cada despliegue o reinicio, y el servicio se duerme tras 15 minutos sin visitas (la primera carga tarda ~1 minuto). Para conservar los datos, usar un plan de pago y activar el disco persistente que está comentado en `render.yaml`.
 
 ## Primer administrador
 

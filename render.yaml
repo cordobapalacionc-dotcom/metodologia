@@ -1,0 +1,34 @@
+# Blueprint de Render para Quibdó Conecta
+# Desplegar: https://dashboard.render.com/blueprint/new?repo=https://github.com/cordobapalacionc-dotcom/metodologia
+services:
+  - type: web
+    name: quibdo-conecta
+    runtime: node
+    plan: free
+    region: oregon
+    # El backend (Express) sirve también el frontend estático desde ../frontend
+    buildCommand: cd backend && npm ci
+    startCommand: cd backend && npm start
+    healthCheckPath: /api/salud
+    autoDeploy: true
+    envVars:
+      - key: NODE_VERSION
+        value: "22"
+      - key: NODE_ENV
+        value: production
+      # Correo(s) que serán administradores al registrarse (separados por comas)
+      - key: ADMIN_CORREOS
+        sync: false
+
+    # IMPORTANTE: en el plan gratuito el disco es temporal, así que la base SQLite
+    # (usuarios, avances, reportes) se borra en cada despliegue o reinicio.
+    # Para conservar los datos, cambia a un plan de pago (p. ej. "starter")
+    # y descomenta estas líneas:
+    #
+    # disk:
+    #   name: datos
+    #   mountPath: /var/data
+    #   sizeGB: 1
+    # (y agrega en envVars:)
+    # - key: RUTA_DB
+    #   value: /var/data/quibdo.db

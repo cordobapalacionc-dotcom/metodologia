@@ -1,7 +1,7 @@
 import { DatabaseSync } from 'node:sqlite';
 import fs from 'node:fs';
 import path from 'node:path';
-import { RUTA_DB } from './config.js';
+import { RUTA_DB, ADMIN_CORREOS } from './config.js';
 import { sembrar } from './semilla.js';
 
 fs.mkdirSync(path.dirname(RUTA_DB), { recursive: true });
@@ -156,3 +156,7 @@ export function transaccion(fn) {
 db.prepare('DELETE FROM sesiones WHERE expira <= ?').run(new Date().toISOString());
 
 sembrar(db, transaccion);
+
+// Administradores definidos por la variable de entorno ADMIN_CORREOS (útil en hosting sin terminal)
+const hacerAdmin = db.prepare("UPDATE usuarios SET rol = 'admin' WHERE correo = ?");
+for (const correo of ADMIN_CORREOS) hacerAdmin.run(correo);
