@@ -5,8 +5,8 @@
 import { db } from './db.js';
 import { OPCIONES } from './rutas/diagnosticos.js';
 
-const uno = (sql, ...p) => db.prepare(sql).get(...p);
-const todos = (sql, ...p) => db.prepare(sql).all(...p);
+const uno = async (sql, ...p) => await db.prepare(sql).get(...p);
+const todos = async (sql, ...p) => await db.prepare(sql).all(...p);
 const NIVELES = { 1: 'Ninguno', 2: 'Básico', 3: 'Intermedio', 4: 'Avanzado' };
 
 /** Últimos 12 meses como ['2025-12', …, '2026-11']. */
@@ -19,21 +19,21 @@ function meses() {
 }
 
 /** Cuenta por mes una columna de fecha de una tabla. */
-function porMes(tabla, columna, lista) {
-  const filas = todos(`SELECT substr(${columna}, 1, 7) AS mes, COUNT(*) AS n FROM ${tabla}
+async function porMes(tabla, columna, lista) {
+  const filas = await todos(`SELECT substr(${columna}, 1, 7) AS mes, COUNT(*) AS n FROM ${tabla}
                        WHERE substr(${columna}, 1, 7) >= ? GROUP BY mes`, lista[0]);
   const mapa = Object.fromEntries(filas.map(f => [f.mes, f.n]));
   return lista.map(m => mapa[m] || 0);
 }
 
-export function calcularImpacto() {
-  const personas = uno('SELECT COUNT(*) AS n FROM usuarios').n;
+export async function calcularImpacto() {
+  const personas = (await uno('SELECT COUNT(*) AS n FROM usuarios')).n;
   // Formada = completó al menos una lección o tiene un certificado (aunque su curso se haya borrado después)
-  const formadas = uno('SELECT COUNT(*) AS n FROM (SELECT usuario_id FROM progreso UNION SELECT usuario_id FROM certificados)').n;
-  const certificadas = uno('SELECT COUNT(DISTINCT usuario_id) AS n FROM certificados').n;
+  const formadas = (await uno('SELECT COUNT(*) AS n FROM (SELECT usuario_id FROM progreso UNION SELECT usuario_id FROM certificados) AS f')).n;
+  const certificadas = (await uno('SELECT COUNT(DISTINCT usuario_id) AS n FROM certificados')).n;
 
   // Personas que empezaron un curso y cuántas lo terminaron
-  const avance = todos(`
+  const avance = await todos(`
     SELECT p.usuario_id, l.curso_id, COUNT(*) AS hechas,
       (SELECT COUNT(*) FROM lecciones l2 WHERE l2.curso_id = l.curso_id) AS total
     FROM progreso p JOIN lecciones l ON l.id = p.leccion_id
@@ -45,19 +45,19 @@ export function calcularImpacto() {
   const agrupar = columna => todos(`
     SELECT COALESCE(NULLIF(TRIM(MAX(u.${columna})), ''), 'Sin dato') AS nombre,
       COUNT(*) AS personas,
-      SUM(EXISTS (SELECT 1 FROM progreso p WHERE p.usuario_id = u.id)
-          OR EXISTS (SELECT 1 FROM certificados c WHERE c.usuario_id = u.id)) AS formadas,
-      SUM(EXISTS (SELECT 1 FROM certificados c WHERE c.usuario_id = u.id)) AS certificadas
+      SUM((EXISTS (SELECT 1 FROM progreso p WHERE p.usuario_id = u.id)
+          OR EXISTS (SELECT 1 FROM certificados c WHERE c.usuario_id = u.id))::int) AS formadas,
+      SUM((EXISTS (SELECT 1 FROM certificados c WHERE c.usuario_id = u.id))::int) AS certificadas
     FROM usuarios u GROUP BY LOWER(TRIM(COALESCE(u.${columna}, ''))) ORDER BY personas DESC, nombre`);
-  const barrios = agrupar('barrio');
-  const perfiles = agrupar('perfil');
+  const barrios = await agrupar('barrio');
+  const perfiles = await agrupar('perfil');
 
   /* ---------- Por curso ---------- */
-  const cursos = todos(`
+  const cursos = (await todos(`
     SELECT c.id, c.titulo, c.codigo_acceso IS NOT NULL AS grupo, a.nombre AS facilitador,
       (SELECT COUNT(*) FROM lecciones l WHERE l.curso_id = c.id) AS lecciones,
       (SELECT COUNT(*) FROM certificados ce WHERE ce.curso_id = c.id) AS certificados
-    FROM cursos c LEFT JOIN usuarios a ON a.id = c.autor_id ORDER BY c.orden`)
+    FROM cursos c LEFT JOIN usuarios a ON a.id = c.autor_id ORDER BY c.orden`))
     .map(c => {
       const de = avance.filter(a => a.curso_id === c.id);
       return { ...c, grupo: !!c.grupo, iniciaron: de.length, terminaron: de.filter(a => a.hechas >= a.total).length };
@@ -65,30 +65,30 @@ export function calcularImpacto() {
     .sort((a, b) => b.iniciaron - a.iniciaron);
 
   /* ---------- Diagnóstico de la comunidad ---------- */
-  const diagnosticos = uno('SELECT COUNT(*) AS n FROM diagnosticos').n;
-  const contar = (columna, opciones) => {
-    const m = Object.fromEntries(todos(`SELECT ${columna} AS v, COUNT(*) AS n FROM diagnosticos GROUP BY ${columna}`).map(f => [f.v, f.n]));
+  const diagnosticos = (await uno('SELECT COUNT(*) AS n FROM diagnosticos')).n;
+  const contar = async (columna, opciones) => {
+    const m = Object.fromEntries((await todos(`SELECT ${columna} AS v, COUNT(*) AS n FROM diagnosticos GROUP BY ${columna}`)).map(f => [f.v, f.n]));
     return opciones.map(o => ({ nombre: o, n: m[o] || 0 }));
   };
-  const dificultades = (() => {
-    const m = Object.fromEntries(todos(`
-      SELECT j.value AS v, COUNT(*) AS n FROM diagnosticos d, json_each(d.dificultades) j GROUP BY j.value`).map(f => [f.v, f.n]));
+  const dificultades = await (async () => {
+    const m = Object.fromEntries((await todos(`
+      SELECT j.value AS v, COUNT(*) AS n FROM diagnosticos d, jsonb_array_elements_text(d.dificultades::jsonb) AS j(value) GROUP BY j.value`)).map(f => [f.v, f.n]));
     return OPCIONES.dificultades.map(o => ({ nombre: o, n: m[o] || 0 })).sort((a, b) => b.n - a.n);
   })();
-  const niveles = (() => {
-    const m = Object.fromEntries(todos('SELECT nivel AS v, COUNT(*) AS n FROM diagnosticos GROUP BY nivel').map(f => [f.v, f.n]));
+  const niveles = await (async () => {
+    const m = Object.fromEntries((await todos('SELECT nivel AS v, COUNT(*) AS n FROM diagnosticos GROUP BY nivel')).map(f => [f.v, f.n]));
     return Object.entries(NIVELES).map(([k, nombre]) => ({ nombre, n: m[k] || 0 }));
   })();
 
   /* ---------- Conectividad ---------- */
-  const puntos = Object.fromEntries(todos(
-    'SELECT tipo, COUNT(*) AS n FROM puntos WHERE verificado = 1 GROUP BY tipo').map(f => [f.tipo, f.n]));
+  const puntos = Object.fromEntries((await todos(
+    'SELECT tipo, COUNT(*) AS n FROM puntos WHERE verificado = 1 GROUP BY tipo')).map(f => [f.tipo, f.n]));
 
   /* ---------- Facilitadores ---------- */
   const facilitadores = {
-    personas: uno("SELECT COUNT(*) AS n FROM usuarios WHERE rol = 'facilitador'").n,
-    grupos: uno('SELECT COUNT(*) AS n FROM cursos WHERE codigo_acceso IS NOT NULL').n,
-    estudiantes: uno('SELECT COUNT(DISTINCT usuario_id) AS n FROM inscripciones').n,
+    personas: (await uno("SELECT COUNT(*) AS n FROM usuarios WHERE rol = 'facilitador'")).n,
+    grupos: (await uno('SELECT COUNT(*) AS n FROM cursos WHERE codigo_acceso IS NOT NULL')).n,
+    estudiantes: (await uno('SELECT COUNT(DISTINCT usuario_id) AS n FROM inscripciones')).n,
   };
 
   const lista = meses();
@@ -96,25 +96,25 @@ export function calcularImpacto() {
     generado: new Date().toISOString(),
     resumen: {
       personas, formadas, certificadas,
-      certificados: uno('SELECT COUNT(*) AS n FROM certificados').n,
-      lecciones: uno('SELECT COUNT(*) AS n FROM progreso').n,
+      certificados: (await uno('SELECT COUNT(*) AS n FROM certificados')).n,
+      lecciones: (await uno('SELECT COUNT(*) AS n FROM progreso')).n,
       iniciados, terminados,
       diagnosticos,
       wifi: (puntos.wifi || 0) + (puntos.comunitario || 0),
       zonas: puntos.zona || 0,
-      pendientes: uno('SELECT COUNT(*) AS n FROM puntos WHERE verificado = 0').n,
+      pendientes: (await uno('SELECT COUNT(*) AS n FROM puntos WHERE verificado = 0')).n,
     },
     meses: lista,
     serie: {
-      registros: porMes('usuarios', 'creado', lista),
-      lecciones: porMes('progreso', 'fecha', lista),
-      certificados: porMes('certificados', 'fecha', lista),
-      diagnosticos: porMes('diagnosticos', 'fecha', lista),
+      registros: await porMes('usuarios', 'creado', lista),
+      lecciones: await porMes('progreso', 'fecha', lista),
+      certificados: await porMes('certificados', 'fecha', lista),
+      diagnosticos: await porMes('diagnosticos', 'fecha', lista),
     },
     barrios, perfiles, cursos,
     diagnostico: {
-      internet: contar('internet', OPCIONES.internet),
-      calidad: contar('calidad', OPCIONES.calidad),
+      internet: await contar('internet', OPCIONES.internet),
+      calidad: await contar('calidad', OPCIONES.calidad),
       niveles,
       dificultades,
     },

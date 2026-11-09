@@ -4,6 +4,9 @@ import { fileURLToPath } from 'node:url';
 const raiz = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 
 export const PUERTO = Number(process.env.PORT || 3000);
+/** Cadena de conexión de PostgreSQL (en Supabase: Project Settings → Database → Connection string). */
+export const DATABASE_URL = process.env.DATABASE_URL || '';
+/** Base SQLite de la versión anterior: solo la usa `npm run migrar`. */
 export const RUTA_DB = process.env.RUTA_DB || path.join(raiz, 'datos', 'quibdo.db');
 export const CARPETA_FRONTEND = path.resolve(raiz, '..', 'frontend');
 export const PRODUCCION = process.env.NODE_ENV === 'production';
@@ -23,10 +26,9 @@ export const DIAS_SESION_CORTA = 1;
 export const URL_PUBLICA = (process.env.URL_PUBLICA || '').replace(/\/+$/, '');
 
 /* ---------- Copias de seguridad ---------- */
-export const CARPETA_COPIAS = process.env.RUTA_COPIAS || path.join(path.dirname(RUTA_DB), 'copias');
 /** Cada cuántas horas se hace una copia automática. */
 export const HORAS_ENTRE_COPIAS = Number(process.env.HORAS_ENTRE_COPIAS || 24);
 /** Cuántas copias se guardan como máximo (se borran las más antiguas). */
 export const COPIAS_MAX = Number(process.env.COPIAS_MAX || 30);
 /** Formato del nombre de las copias (evita leer archivos fuera de la carpeta). */
-export const PATRON_COPIA = /^quibdo-\d{8}-\d{6}(-manual)?\.db$/;
+export const PATRON_COPIA = /^quibdo-\d{8}-\d{6}(-manual)?\.json$/;

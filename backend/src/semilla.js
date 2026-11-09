@@ -87,30 +87,30 @@ const OPORTUNIDADES = [
   { titulo: 'Convocatorias para jóvenes investigadores', tipo: 'Convocatoria', entidad: 'Minciencias', descripcion: 'Programas para jóvenes investigadores e innovadores.', url: 'https://minciencias.gov.co' },
 ];
 
-const vacia = (db, tabla) => db.prepare(`SELECT COUNT(*) AS n FROM ${tabla}`).get().n === 0;
+const vacia = async (db, tabla) => (await db.prepare(`SELECT COUNT(*) AS n FROM ${tabla}`).get()).n === 0;
 
-export function sembrar(db, transaccion) {
-  transaccion(() => {
-    if (vacia(db, 'cursos')) {
+export async function sembrar(db, transaccion) {
+  await transaccion(async () => {
+    if (await vacia(db, 'cursos')) {
       const insCurso = db.prepare('INSERT INTO cursos (id, titulo, icono, color, nivel, publico, orden) VALUES (?,?,?,?,?,?,?)');
       const insLeccion = db.prepare('INSERT INTO lecciones (curso_id, orden, titulo, contenido, pregunta, opciones, respuesta) VALUES (?,?,?,?,?,?,?)');
-      CURSOS.forEach((c, i) => {
-        insCurso.run(c.id, c.titulo, c.icono, c.color, c.nivel, c.publico, i);
-        c.lecciones.forEach((l, j) =>
-          insLeccion.run(c.id, j, l.titulo, l.contenido, l.pregunta, JSON.stringify(l.opciones), l.respuesta));
-      });
+      for (const [i, c] of CURSOS.entries()) {
+        await insCurso.run(c.id, c.titulo, c.icono, c.color, c.nivel, c.publico, i);
+        for (const [j, l] of c.lecciones.entries())
+          await insLeccion.run(c.id, j, l.titulo, l.contenido, l.pregunta, JSON.stringify(l.opciones), l.respuesta);
+      }
     }
-    if (vacia(db, 'puntos')) {
+    if (await vacia(db, 'puntos')) {
       const ins = db.prepare('INSERT INTO puntos (nombre, tipo, lat, lng, radio, horario, senal, descripcion) VALUES (?,?,?,?,?,?,?,?)');
-      PUNTOS.forEach(p => ins.run(p.nombre, p.tipo, p.lat, p.lng, p.radio ?? null, p.horario ?? null, p.senal, p.descripcion));
+      for (const p of PUNTOS) await ins.run(p.nombre, p.tipo, p.lat, p.lng, p.radio ?? null, p.horario ?? null, p.senal, p.descripcion);
     }
-    if (vacia(db, 'recursos')) {
+    if (await vacia(db, 'recursos')) {
       const ins = db.prepare('INSERT INTO recursos (titulo, tipo, tema, icono, extension, contenido) VALUES (?,?,?,?,?,?)');
-      RECURSOS.forEach(r => ins.run(r.titulo, r.tipo, r.tema, r.icono, r.extension || 'txt', r.contenido));
+      for (const r of RECURSOS) await ins.run(r.titulo, r.tipo, r.tema, r.icono, r.extension || 'txt', r.contenido);
     }
-    if (vacia(db, 'oportunidades')) {
+    if (await vacia(db, 'oportunidades')) {
       const ins = db.prepare('INSERT INTO oportunidades (titulo, tipo, entidad, descripcion, url) VALUES (?,?,?,?,?)');
-      OPORTUNIDADES.forEach(o => ins.run(o.titulo, o.tipo, o.entidad, o.descripcion, o.url));
+      for (const o of OPORTUNIDADES) await ins.run(o.titulo, o.tipo, o.entidad, o.descripcion, o.url);
     }
   });
 }

@@ -10,16 +10,16 @@ const r = Router();
  * GET /api/cursos — cursos que puede ver el usuario (los abiertos, los de sus grupos
  * y los que él creó) con su avance. Nunca incluye el código de invitación.
  */
-r.get('/', (req, res) => {
+r.get('/', async (req, res) => {
   const u = uid(req.usuario);
-  const cursos = db.prepare(`
+  const cursos = await db.prepare(`
     SELECT c.id, c.titulo, c.icono, c.color, c.nivel, c.publico, c.orden,
       c.codigo_acceso IS NOT NULL AS grupo, a.nombre AS facilitador,
       (SELECT COUNT(*) FROM lecciones l WHERE l.curso_id = c.id) AS total
     FROM cursos c LEFT JOIN usuarios a ON a.id = c.autor_id
     WHERE ${VISIBLE('c')} ORDER BY grupo DESC, c.orden`).all(u, u);
   const hechas = req.usuario
-    ? db.prepare(`
+    ? await db.prepare(`
         SELECT l.curso_id, COUNT(*) AS n FROM progreso p
         JOIN lecciones l ON l.id = p.leccion_id
         WHERE p.usuario_id = ? GROUP BY l.curso_id`).all(req.usuario.id)
@@ -31,9 +31,9 @@ r.get('/', (req, res) => {
 });
 
 /** GET /api/cursos/progreso — resumen para la página de inicio (solo cursos visibles) */
-r.get('/progreso', requiereSesion, (req, res) => {
+r.get('/progreso', requiereSesion, async (req, res) => {
   const u = req.usuario.id;
-  const filas = db.prepare(`
+  const filas = await db.prepare(`
     SELECT (SELECT COUNT(*) FROM lecciones l WHERE l.curso_id = c.id) AS total,
            (SELECT COUNT(*) FROM progreso p JOIN lecciones l ON l.id = p.leccion_id
             WHERE l.curso_id = c.id AND p.usuario_id = ?) AS hechas
@@ -50,24 +50,24 @@ r.get('/progreso', requiereSesion, (req, res) => {
  * POST /api/cursos/unirse { codigo } — entrar al curso de un facilitador con su código.
  * Limitado para que no se puedan probar códigos al azar.
  */
-r.post('/unirse', requiereSesion, limitador({ ventanaMin: 15, max: 20 }), (req, res) => {
+r.post('/unirse', requiereSesion, limitador({ ventanaMin: 15, max: 20 }), async (req, res) => {
   const codigo = normalizarCodigo(req.body?.codigo);
   if (codigo.length !== 6) throw new ErrorHttp(400, 'El código del curso tiene 6 caracteres. Revísalo e inténtalo de nuevo.');
-  const curso = db.prepare('SELECT id, titulo FROM cursos WHERE codigo_acceso = ?').get(codigo);
+  const curso = await db.prepare('SELECT id, titulo FROM cursos WHERE codigo_acceso = ?').get(codigo);
   if (!curso) throw new ErrorHttp(404, 'No hay ningún curso con ese código. Pídelo de nuevo a tu facilitador.');
-  const { changes } = db.prepare('INSERT OR IGNORE INTO inscripciones (usuario_id, curso_id) VALUES (?,?)').run(req.usuario.id, curso.id);
+  const { changes } = await db.prepare('INSERT INTO inscripciones (usuario_id, curso_id) VALUES (?,?) ON CONFLICT DO NOTHING').run(req.usuario.id, curso.id);
   res.status(changes ? 201 : 200).json({ ...curso, nuevo: !!changes });
 });
 
 /** GET /api/cursos/:id — curso con sus lecciones (sin la respuesta correcta) */
-r.get('/:id', (req, res) => {
-  const curso = cursoVisible(req.usuario, req.params.id);
+r.get('/:id', async (req, res) => {
+  const curso = await cursoVisible(req.usuario, req.params.id);
   if (!curso) throw new ErrorHttp(404, 'Curso no encontrado. Si es el curso de un grupo, únete primero con el código de tu facilitador.');
-  const lecciones = db.prepare(`
+  const lecciones = await db.prepare(`
     SELECT id, orden, titulo, contenido, pregunta, opciones
     FROM lecciones WHERE curso_id = ? ORDER BY orden`).all(curso.id);
   const hechas = new Set(req.usuario
-    ? db.prepare('SELECT leccion_id FROM progreso WHERE usuario_id = ?').all(req.usuario.id).map(x => x.leccion_id)
+    ? (await db.prepare('SELECT leccion_id FROM progreso WHERE usuario_id = ?').all(req.usuario.id)).map(x => x.leccion_id)
     : []);
   const { codigo_acceso, autor_id, ...publico } = curso;
   res.json({
@@ -78,16 +78,16 @@ r.get('/:id', (req, res) => {
 });
 
 /** POST /api/cursos/lecciones/:id/responder — el servidor corrige la respuesta */
-r.post('/lecciones/:id/responder', (req, res) => {
-  const leccion = db.prepare('SELECT id, curso_id, respuesta FROM lecciones WHERE id = ?').get(idParam(req.params.id));
-  if (!leccion || !cursoVisible(req.usuario, leccion.curso_id)) throw new ErrorHttp(404, 'Lección no encontrada.');
+r.post('/lecciones/:id/responder', async (req, res) => {
+  const leccion = await db.prepare('SELECT id, curso_id, respuesta FROM lecciones WHERE id = ?').get(idParam(req.params.id));
+  if (!leccion || !await cursoVisible(req.usuario, leccion.curso_id)) throw new ErrorHttp(404, 'Lección no encontrada.');
   const opcion = Number(req.body?.opcion);
   if (!Number.isInteger(opcion)) throw new ErrorHttp(400, 'Selecciona una respuesta.');
 
   const correcto = opcion === leccion.respuesta;
   let guardado = false;
   if (correcto && req.usuario) {
-    db.prepare('INSERT OR IGNORE INTO progreso (usuario_id, leccion_id) VALUES (?,?)').run(req.usuario.id, leccion.id);
+    await db.prepare('INSERT INTO progreso (usuario_id, leccion_id) VALUES (?,?) ON CONFLICT DO NOTHING').run(req.usuario.id, leccion.id);
     guardado = true;
   }
   res.json({ correcto, guardado });

@@ -8,7 +8,7 @@ import { ErrorHttp, texto, idParam, coordenadas } from '../utilidades.js';
 import {
   cursosParaEditor, crearCurso, actualizarCurso, borrarCurso, crearLeccion, actualizarLeccion, borrarLeccion,
 } from '../servicioCursos.js';
-import { listarCopias, crearCopia, rutaCopia } from '../copias.js';
+import { listarCopias, crearCopia, leerCopia } from '../copias.js';
 import { calcularImpacto, impactoCsv } from '../impacto.js';
 import { TIPOS_PUNTO } from './puntos.js';
 
@@ -16,23 +16,23 @@ const r = Router();
 r.use(requiereSesion, requiereAdmin);
 
 /* =================== Resumen =================== */
-r.get('/resumen', (_req, res) => {
-  const n = sql => db.prepare(sql).get().n;
+r.get('/resumen', async (_req, res) => {
+  const n = async sql => (await db.prepare(sql).get()).n;
   res.json({
-    usuarios: n('SELECT COUNT(*) AS n FROM usuarios'),
-    diagnosticos: n('SELECT COUNT(*) AS n FROM diagnosticos'),
-    diagnosticosSemana: n("SELECT COUNT(*) AS n FROM diagnosticos WHERE fecha >= datetime('now','-7 days')"),
-    reportesPendientes: n('SELECT COUNT(*) AS n FROM puntos WHERE verificado = 0'),
-    certificados: n('SELECT COUNT(*) AS n FROM certificados'),
-    leccionesCompletadas: n('SELECT COUNT(*) AS n FROM progreso'),
-    cursos: n('SELECT COUNT(*) AS n FROM cursos'),
-    oportunidades: n('SELECT COUNT(*) AS n FROM oportunidades'),
+    usuarios: await n('SELECT COUNT(*) AS n FROM usuarios'),
+    diagnosticos: await n('SELECT COUNT(*) AS n FROM diagnosticos'),
+    diagnosticosSemana: await n("SELECT COUNT(*) AS n FROM diagnosticos WHERE fecha >= datetime('now','-7 days')"),
+    reportesPendientes: await n('SELECT COUNT(*) AS n FROM puntos WHERE verificado = 0'),
+    certificados: await n('SELECT COUNT(*) AS n FROM certificados'),
+    leccionesCompletadas: await n('SELECT COUNT(*) AS n FROM progreso'),
+    cursos: await n('SELECT COUNT(*) AS n FROM cursos'),
+    oportunidades: await n('SELECT COUNT(*) AS n FROM oportunidades'),
   });
 });
 
 /* =================== Reportes del mapa =================== */
-r.get('/puntos', (_req, res) => {
-  res.json(db.prepare(`
+r.get('/puntos', async (_req, res) => {
+  res.json(await db.prepare(`
     SELECT p.*, u.nombre AS autor, u.correo AS autor_correo
     FROM puntos p LEFT JOIN usuarios u ON u.id = p.reportado_por
     ORDER BY p.verificado ASC, p.creado DESC`).all());
@@ -51,24 +51,24 @@ function datosPunto(b) {
   };
 }
 
-r.put('/puntos/:id', (req, res) => {
+r.put('/puntos/:id', async (req, res) => {
   const id = idParam(req.params.id);
   const p = datosPunto(req.body ?? {});
-  const { changes } = db.prepare(`
+  const { changes } = await db.prepare(`
     UPDATE puntos SET nombre=?, tipo=?, lat=?, lng=?, radio=?, horario=?, senal=?, descripcion=?, verificado=1 WHERE id=?`)
     .run(p.nombre, p.tipo, p.lat, p.lng, p.radio, p.horario, p.senal, p.descripcion, id);
   if (!changes) throw new ErrorHttp(404, 'Punto no encontrado.');
   res.json({ ok: true });
 });
 
-r.post('/puntos/:id/verificar', (req, res) => {
-  const { changes } = db.prepare('UPDATE puntos SET verificado = 1 WHERE id = ?').run(idParam(req.params.id));
+r.post('/puntos/:id/verificar', async (req, res) => {
+  const { changes } = await db.prepare('UPDATE puntos SET verificado = 1 WHERE id = ?').run(idParam(req.params.id));
   if (!changes) throw new ErrorHttp(404, 'Punto no encontrado.');
   res.json({ ok: true });
 });
 
-r.delete('/puntos/:id', (req, res) => {
-  db.prepare('DELETE FROM puntos WHERE id = ?').run(idParam(req.params.id));
+r.delete('/puntos/:id', async (req, res) => {
+  await db.prepare('DELETE FROM puntos WHERE id = ?').run(idParam(req.params.id));
   res.json({ ok: true });
 });
 
@@ -87,106 +87,106 @@ function datosOportunidad(b) {
   return o;
 }
 
-r.post('/oportunidades', (req, res) => {
+r.post('/oportunidades', async (req, res) => {
   const o = datosOportunidad(req.body ?? {});
-  const { lastInsertRowid } = db.prepare('INSERT INTO oportunidades (titulo, tipo, entidad, descripcion, url) VALUES (?,?,?,?,?)')
+  const { lastInsertRowid } = await db.prepare('INSERT INTO oportunidades (titulo, tipo, entidad, descripcion, url) VALUES (?,?,?,?,?)')
     .run(o.titulo, o.tipo, o.entidad, o.descripcion, o.url);
   res.status(201).json({ id: Number(lastInsertRowid) });
 });
 
-r.put('/oportunidades/:id', (req, res) => {
+r.put('/oportunidades/:id', async (req, res) => {
   const o = datosOportunidad(req.body ?? {});
-  const { changes } = db.prepare('UPDATE oportunidades SET titulo=?, tipo=?, entidad=?, descripcion=?, url=? WHERE id=?')
+  const { changes } = await db.prepare('UPDATE oportunidades SET titulo=?, tipo=?, entidad=?, descripcion=?, url=? WHERE id=?')
     .run(o.titulo, o.tipo, o.entidad, o.descripcion, o.url, idParam(req.params.id));
   if (!changes) throw new ErrorHttp(404, 'Oportunidad no encontrada.');
   res.json({ ok: true });
 });
 
-r.delete('/oportunidades/:id', (req, res) => {
-  db.prepare('DELETE FROM oportunidades WHERE id = ?').run(idParam(req.params.id));
+r.delete('/oportunidades/:id', async (req, res) => {
+  await db.prepare('DELETE FROM oportunidades WHERE id = ?').run(idParam(req.params.id));
   res.json({ ok: true });
 });
 
 /* =================== Cursos y lecciones =================== */
 // Lista todos: los de la plataforma y los de grupo (con su facilitador y código)
-r.get('/cursos', (_req, res) => res.json(cursosParaEditor()));
+r.get('/cursos', async (_req, res) => res.json(await cursosParaEditor()));
 
-r.post('/cursos', (req, res) => res.status(201).json(crearCurso(req.body ?? {})));
+r.post('/cursos', async (req, res) => res.status(201).json(await crearCurso(req.body ?? {})));
 
-r.put('/cursos/:id', (req, res) => {
-  actualizarCurso(req.params.id, req.body ?? {});
+r.put('/cursos/:id', async (req, res) => {
+  await actualizarCurso(req.params.id, req.body ?? {});
   res.json({ ok: true });
 });
 
-r.delete('/cursos/:id', (req, res) => {
-  borrarCurso(req.params.id);
+r.delete('/cursos/:id', async (req, res) => {
+  await borrarCurso(req.params.id);
   res.json({ ok: true });
 });
 
-r.post('/cursos/:id/lecciones', (req, res) => {
-  const curso = db.prepare('SELECT id FROM cursos WHERE id = ?').get(req.params.id);
+r.post('/cursos/:id/lecciones', async (req, res) => {
+  const curso = await db.prepare('SELECT id FROM cursos WHERE id = ?').get(req.params.id);
   if (!curso) throw new ErrorHttp(404, 'Curso no encontrado.');
-  res.status(201).json({ id: crearLeccion(curso.id, req.body ?? {}) });
+  res.status(201).json({ id: await crearLeccion(curso.id, req.body ?? {}) });
 });
 
-r.put('/lecciones/:id', (req, res) => {
-  actualizarLeccion(req.params.id, req.body ?? {});
+r.put('/lecciones/:id', async (req, res) => {
+  await actualizarLeccion(req.params.id, req.body ?? {});
   res.json({ ok: true });
 });
 
-r.delete('/lecciones/:id', (req, res) => {
-  borrarLeccion(idParam(req.params.id));
+r.delete('/lecciones/:id', async (req, res) => {
+  await borrarLeccion(idParam(req.params.id));
   res.json({ ok: true });
 });
 
 /* =================== Usuarios =================== */
 const ROLES = ['usuario', 'facilitador', 'admin'];
 
-r.get('/usuarios', (_req, res) => {
-  res.json(db.prepare(`
+r.get('/usuarios', async (_req, res) => {
+  res.json(await db.prepare(`
     SELECT u.id, u.nombre, u.correo, u.perfil, u.barrio, u.rol, u.creado,
       (SELECT COUNT(*) FROM progreso p WHERE p.usuario_id = u.id) AS lecciones,
       (SELECT COUNT(*) FROM certificados c WHERE c.usuario_id = u.id) AS certificados
     FROM usuarios u ORDER BY u.creado DESC`).all());
 });
 
-r.put('/usuarios/:id/rol', (req, res) => {
+r.put('/usuarios/:id/rol', async (req, res) => {
   const id = idParam(req.params.id);
   const rol = req.body?.rol;
   if (!ROLES.includes(rol)) throw new ErrorHttp(400, 'Rol no válido.');
   if (id === req.usuario.id) throw new ErrorHttp(400, 'No puedes cambiar tu propio rol.');
-  const { changes } = db.prepare('UPDATE usuarios SET rol = ? WHERE id = ?').run(rol, id);
+  const { changes } = await db.prepare('UPDATE usuarios SET rol = ? WHERE id = ?').run(rol, id);
   if (!changes) throw new ErrorHttp(404, 'Usuario no encontrado.');
   res.json({ ok: true });
 });
 
 /** POST /api/admin/usuarios/:id/recuperacion — código para que la persona cree una contraseña nueva */
-r.post('/usuarios/:id/recuperacion', (req, res) => {
+r.post('/usuarios/:id/recuperacion', async (req, res) => {
   const id = idParam(req.params.id);
   if (id === req.usuario.id) throw new ErrorHttp(400, 'Para cambiar tu propia contraseña usa Mi panel.');
-  const u = db.prepare('SELECT nombre, correo FROM usuarios WHERE id = ?').get(id);
+  const u = await db.prepare('SELECT nombre, correo FROM usuarios WHERE id = ?').get(id);
   if (!u) throw new ErrorHttp(404, 'Usuario no encontrado.');
-  res.status(201).json({ ...u, ...crearCodigoRecuperacion(id, req.usuario.id) });
+  res.status(201).json({ ...u, ...await crearCodigoRecuperacion(id, req.usuario.id) });
 });
 
 /* =================== Tablero de impacto =================== */
-r.get('/impacto', (_req, res) => res.json(calcularImpacto()));
+r.get('/impacto', async (_req, res) => res.json(await calcularImpacto()));
 
-r.get('/impacto.csv', (_req, res) => {
+r.get('/impacto.csv', async (_req, res) => {
   const fecha = new Date().toISOString().slice(0, 10);
-  res.attachment(`impacto-quibdo-conecta-${fecha}.csv`).type('text/csv; charset=utf-8').send('﻿' + impactoCsv(calcularImpacto()));
+  res.attachment(`impacto-quibdo-conecta-${fecha}.csv`).type('text/csv; charset=utf-8').send('﻿' + impactoCsv(await calcularImpacto()));
 });
 
 /* =================== Copias de seguridad =================== */
-r.get('/copias', (_req, res) => res.json(listarCopias()));
+r.get('/copias', async (_req, res) => res.json(await listarCopias()));
 
-r.post('/copias', (_req, res) => res.status(201).json(crearCopia(true)));
+r.post('/copias', async (_req, res) => res.status(201).json(await crearCopia(true)));
 
 /** Descarga de una copia: contiene datos personales, por eso solo la ven los admins. */
-r.get('/copias/:nombre', (req, res) => {
-  const ruta = rutaCopia(req.params.nombre);
-  if (!ruta) throw new ErrorHttp(404, 'Copia no encontrada.');
-  res.download(ruta, req.params.nombre);
+r.get('/copias/:nombre', async (req, res) => {
+  const datos = await leerCopia(req.params.nombre);
+  if (!datos) throw new ErrorHttp(404, 'Copia no encontrada.');
+  res.attachment(req.params.nombre).type('application/json').send(datos);
 });
 
 export default r;

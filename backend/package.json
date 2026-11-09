@@ -10,7 +10,8 @@
     "dev": "node --watch src/server.js",
     "admin": "node scripts/crear-admin.js",
     "copia": "node scripts/copia.js",
-    "restaurar": "node scripts/restaurar.js"
+    "restaurar": "node scripts/restaurar.js",
+    "migrar": "node scripts/migrar-desde-sqlite.js"
   },
   "engines": {
     "node": ">=22.13"
@@ -18,6 +19,7 @@
   "dependencies": {
     "express": "^5.1.0",
     "leaflet": "^1.9.4",
+    "pg": "^8.23.1",
     "qrcode": "^1.5.4"
   }
 }

@@ -7,8 +7,8 @@ const r = Router();
 export const TIPOS_PUNTO = ['wifi', 'comunitario', 'zona'];
 
 /** GET /api/puntos — puntos de conexión y zonas con dificultad */
-r.get('/', (_req, res) => {
-  const puntos = db.prepare(`
+r.get('/', async (_req, res) => {
+  const puntos = await db.prepare(`
     SELECT p.id, p.nombre, p.tipo, p.lat, p.lng, p.radio, p.horario, p.senal, p.descripcion, p.verificado,
            u.nombre AS autor
     FROM puntos p LEFT JOIN usuarios u ON u.id = p.reportado_por
@@ -18,14 +18,14 @@ r.get('/', (_req, res) => {
 });
 
 /** POST /api/puntos — reporte comunitario (queda pendiente de verificación) */
-r.post('/', requiereSesion, limitador({ ventanaMin: 60, max: 10, mensaje: 'Has enviado muchos reportes. Intenta más tarde.' }), (req, res) => {
+r.post('/', requiereSesion, limitador({ ventanaMin: 60, max: 10, mensaje: 'Has enviado muchos reportes. Intenta más tarde.' }), async (req, res) => {
   const nombre = texto(req.body?.nombre, 80);
   const tipo = req.body?.tipo;
   if (nombre.length < 3) throw new ErrorHttp(400, 'Escribe el nombre del lugar o barrio.');
   if (!TIPOS_PUNTO.includes(tipo)) throw new ErrorHttp(400, 'Tipo de reporte no válido.');
   const { lat, lng } = coordenadas(req.body?.lat, req.body?.lng);
 
-  const { lastInsertRowid } = db.prepare(`
+  const { lastInsertRowid } = await db.prepare(`
     INSERT INTO puntos (nombre, tipo, lat, lng, radio, senal, descripcion, reportado_por, verificado)
     VALUES (?,?,?,?,?,?,?,?,0)`).run(
       nombre, tipo, lat, lng, tipo === 'zona' ? 400 : null, 'Por verificar',

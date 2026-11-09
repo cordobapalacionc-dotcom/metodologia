@@ -19,8 +19,8 @@ export const OPCIONES = {
 };
 
 /** Análisis usando los títulos actuales de los cursos en la base de datos. */
-export function analizar(d) {
-  const cursos = Object.fromEntries(db.prepare('SELECT id, titulo, icono FROM cursos').all().map(c => [c.id, c]));
+export async function analizar(d) {
+  const cursos = Object.fromEntries((await db.prepare('SELECT id, titulo, icono FROM cursos').all()).map(c => [c.id, c]));
   return analizarBase(d, cursos);
 }
 
@@ -33,7 +33,7 @@ const aFechaSql = f => f.toISOString().replace('T', ' ').slice(0, 19);
  *   fechaLocal: ISO        → fecha real en que se respondió (diagnósticos guardados sin conexión).
  * El límite es alto porque en jornadas de campo se sincronizan muchos a la vez.
  */
-r.post('/', limitador({ ventanaMin: 60, max: 300 }), (req, res) => {
+r.post('/', limitador({ ventanaMin: 60, max: 300 }), async (req, res) => {
   const b = req.body ?? {};
   const lista = (v, validas) => (Array.isArray(v) ? [...new Set(v)].filter(x => validas.includes(x)) : []);
   const d = {
@@ -56,25 +56,25 @@ r.post('/', limitador({ ventanaMin: 60, max: 300 }), (req, res) => {
   }
   const propio = req.usuario && b.paraOtraPersona !== true;
 
-  db.prepare(`
+  await db.prepare(`
     INSERT INTO diagnosticos (usuario_id, fecha, perfil, edad, dispositivos, internet, calidad, frecuencia, nivel, dificultades, barrio)
     VALUES (?,?,?,?,?,?,?,?,?,?,?)`).run(
       propio ? req.usuario.id : null, aFechaSql(fecha), propio ? req.usuario.perfil : null, d.edad,
       JSON.stringify(d.dispositivos), d.internet, d.calidad, d.frecuencia, d.nivel, JSON.stringify(d.dificultades), d.barrio);
-  res.status(201).json({ diagnostico: d, resultado: analizar(d) });
+  res.status(201).json({ diagnostico: d, resultado: await analizar(d) });
 });
 
 /** GET /api/diagnosticos/mio — último diagnóstico del usuario */
-r.get('/mio', requiereSesion, (req, res) => {
-  const fila = db.prepare('SELECT * FROM diagnosticos WHERE usuario_id = ? ORDER BY id DESC LIMIT 1').get(req.usuario.id);
+r.get('/mio', requiereSesion, async (req, res) => {
+  const fila = await db.prepare('SELECT * FROM diagnosticos WHERE usuario_id = ? ORDER BY id DESC LIMIT 1').get(req.usuario.id);
   if (!fila) return res.json({ diagnostico: null });
   const d = desdeFila(fila);
-  res.json({ diagnostico: d, resultado: analizar(d) });
+  res.json({ diagnostico: d, resultado: await analizar(d) });
 });
 
 /** GET /api/diagnosticos/estadisticas — datos agregados (anónimos) de la comunidad */
-r.get('/estadisticas', (_req, res) => {
-  const filas = db.prepare('SELECT * FROM diagnosticos').all().map(desdeFila);
+r.get('/estadisticas', async (_req, res) => {
+  const filas = (await db.prepare('SELECT * FROM diagnosticos').all()).map(desdeFila);
   const total = filas.length;
   if (!total) return res.json({ total: 0 });
   const pct = n => Math.round(n / total * 100);
@@ -95,8 +95,8 @@ r.get('/estadisticas', (_req, res) => {
 });
 
 /** GET /api/diagnosticos/exportar — CSV completo (solo administradores) */
-r.get('/exportar', requiereSesion, requiereAdmin, (_req, res) => {
-  const filas = db.prepare('SELECT * FROM diagnosticos ORDER BY id').all().map(desdeFila);
+r.get('/exportar', requiereSesion, requiereAdmin, async (_req, res) => {
+  const filas = (await db.prepare('SELECT * FROM diagnosticos ORDER BY id').all()).map(desdeFila);
   const cab = ['id', 'fecha', 'perfil', 'edad', 'dispositivos', 'internet', 'calidad', 'frecuencia', 'nivel', 'dificultades', 'barrio'];
   const q = v => `"${String(v ?? '').replace(/"/g, '""')}"`;
   const csv = [cab.join(','), ...filas.map(f =>

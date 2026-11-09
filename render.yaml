@@ -19,18 +19,10 @@ services:
       # Correo(s) que serán administradores al registrarse (separados por comas)
       - key: ADMIN_CORREOS
         sync: false
-
-    # IMPORTANTE: en el plan gratuito el disco es temporal, así que la base SQLite
-    # (usuarios, avances, reportes) se borra en cada despliegue o reinicio.
-    # Para conservar los datos, cambia a un plan de pago (p. ej. "starter")
-    # y descomenta estas líneas:
-    #
-    # disk:
-    #   name: datos
-    #   mountPath: /var/data
-    #   sizeGB: 1
-    # (y agrega en envVars:)
-    # - key: RUTA_DB
-    #   value: /var/data/quibdo.db
-    # - key: RUTA_COPIAS
-    #   value: /var/data/copias
+      # Base de datos PostgreSQL de Supabase (los datos ya no se borran al reiniciar).
+      # Supabase → Connect → "Session pooler" → copiar la URI y poner la contraseña real.
+      - key: DATABASE_URL
+        sync: false
+      # Dirección pública: la llevan los códigos QR de los certificados
+      - key: URL_PUBLICA
+        value: https://quibdo-conecta.onrender.com
