@@ -5,6 +5,7 @@ import {
   usarCodigoRecuperacion, cerrarTodasLasSesiones,
 } from '../autenticacion.js';
 import { ErrorHttp, texto, correoValido, limitador, normalizarCodigo } from '../utilidades.js';
+import { ADMIN_CORREOS } from '../config.js';
 
 const r = Router();
 export const PERFILES = ['Estudiante', 'Adulto', 'Docente', 'Emprendedor', 'Adulto mayor'];
@@ -33,12 +34,13 @@ r.post('/registro', limiteAcceso, async (req, res) => {
     throw new ErrorHttp(409, 'Ya existe una cuenta con ese correo. Inicia sesión.');
 
   const hash = await cifrarClave(clave);
+  const rol = ADMIN_CORREOS.includes(correo) ? 'admin' : 'usuario';
   const { lastInsertRowid } = db
-    .prepare('INSERT INTO usuarios (nombre, correo, perfil, barrio, clave_hash) VALUES (?,?,?,?,?)')
-    .run(nombre, correo, perfil, barrio, hash);
+    .prepare('INSERT INTO usuarios (nombre, correo, perfil, barrio, clave_hash, rol) VALUES (?,?,?,?,?,?)')
+    .run(nombre, correo, perfil, barrio, hash, rol);
   const id = Number(lastInsertRowid);
   crearSesion(res, id, true);
-  res.status(201).json({ usuario: publico({ id, nombre, correo, perfil, barrio, rol: 'usuario' }) });
+  res.status(201).json({ usuario: publico({ id, nombre, correo, perfil, barrio, rol }) });
 });
 
 /** POST /api/auth/login */

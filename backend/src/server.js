@@ -1,7 +1,7 @@
 import express from 'express';
 import path from 'node:path';
 import { createRequire } from 'node:module';
-import { PUERTO, CARPETA_FRONTEND } from './config.js';
+import { PUERTO, CARPETA_FRONTEND, DETRAS_DE_PROXY } from './config.js';
 import './db.js';
 import { cargarUsuario } from './autenticacion.js';
 import { manejadorErrores } from './utilidades.js';
@@ -24,6 +24,8 @@ const TESELAS = 'https://tile.openstreetmap.org';
 
 const app = express();
 app.disable('x-powered-by');
+// Detrás del proxy de Render: req.ip es la IP real (lo usa el limitador de intentos)
+if (DETRAS_DE_PROXY) app.set('trust proxy', 1);
 
 // Cabeceras de seguridad básicas
 app.use((_req, res, next) => {
