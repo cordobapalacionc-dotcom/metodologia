@@ -2,7 +2,7 @@ import express from 'express';
 import path from 'node:path';
 import { createRequire } from 'node:module';
 import { PUERTO, CARPETA_FRONTEND, DETRAS_DE_PROXY } from './config.js';
-import './db.js';
+import { prepararBaseDeDatos } from './db.js';
 import { cargarUsuario } from './autenticacion.js';
 import { manejadorErrores } from './utilidades.js';
 import rutasAuth from './rutas/auth.js';
@@ -28,7 +28,7 @@ app.disable('x-powered-by');
 if (DETRAS_DE_PROXY) app.set('trust proxy', 1);
 
 // Cabeceras de seguridad básicas
-app.use((_req, res, next) => {
+app.use(async (_req, res, next) => {
   res.set({
     'X-Content-Type-Options': 'nosniff',
     'X-Frame-Options': 'DENY',
@@ -44,7 +44,7 @@ app.use(express.json({ limit: '20kb' }));
 app.use(cargarUsuario);
 
 /* ---------- API ---------- */
-app.get('/api/salud', (_req, res) => res.json({ ok: true }));
+app.get('/api/salud', async (_req, res) => res.json({ ok: true }));
 app.use('/api/auth', rutasAuth);
 app.use('/api/cursos', rutasCursos);
 app.use('/api/puntos', rutasPuntos);
@@ -55,17 +55,19 @@ app.use('/api/certificados', rutasCertificados);
 app.use('/api/admin', rutasAdmin);
 app.use('/api/perfil', rutasPerfil);
 app.use('/api/facilitador', rutasFacilitador);
-app.use('/api', (_req, res) => res.status(404).json({ error: 'Ruta no encontrada.' }));
+app.use('/api', async (_req, res) => res.status(404).json({ error: 'Ruta no encontrada.' }));
 
 /* ---------- Librerías del frontend ---------- */
 app.use('/vendor/leaflet', express.static(CARPETA_LEAFLET, { maxAge: '30d' }));
 
 /* ---------- Frontend (páginas estáticas: /aula sirve aula.html) ---------- */
 app.use(express.static(CARPETA_FRONTEND, { extensions: ['html'] }));
-app.use((_req, res) => res.status(404).type('html').send(
+app.use(async (_req, res) => res.status(404).type('html').send(
   '<!DOCTYPE html><meta charset="utf-8"><title>No encontrada</title><p>Página no encontrada. <a href="/inicio">Volver al inicio</a></p>'));
 
 app.use(manejadorErrores);
+
+await prepararBaseDeDatos();
 
 app.listen(PUERTO, () => {
   console.log(`\n  Quibdó Conecta funcionando en  http://localhost:${PUERTO}\n`);

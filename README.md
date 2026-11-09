@@ -13,6 +13,7 @@ Quibdó Conecta reúne en un solo lugar formación digital básica, información
 - [Tecnologías](#tecnologías)
 - [Instalación y ejecución](#instalación-y-ejecución)
 - [Despliegue en Render](#despliegue-en-render)
+- [Base de datos en Supabase](#base-de-datos-en-supabase)
 - [Primer administrador](#primer-administrador)
 - [Roles](#roles)
 - [Recuperar una contraseña](#recuperar-una-contraseña)
@@ -83,7 +84,7 @@ Docentes y líderes comunitarios que acompañan a un grupo:
 | Capa | Tecnología |
 |---|---|
 | Servidor | [Node.js](https://nodejs.org) 22.13 o superior + [Express 5](https://expressjs.com) |
-| Base de datos | SQLite, con el módulo `node:sqlite` que trae Node (no requiere instalar nada más) |
+| Base de datos | [PostgreSQL](https://www.postgresql.org) en [Supabase](https://supabase.com) (plan gratuito), con la librería `pg` |
 | Frontend | HTML, CSS y JavaScript sin frameworks, con módulos ES |
 | Mapa | [Leaflet](https://leafletjs.com) + teselas de [OpenStreetMap](https://www.openstreetmap.org) |
 | Código QR | [qrcode](https://www.npmjs.com/package/qrcode), generado en el servidor como SVG |
@@ -93,7 +94,7 @@ Las únicas dependencias son `express`, `leaflet` y `qrcode`.
 
 ## Instalación y ejecución
 
-**Requisito:** [Node.js](https://nodejs.org) 22.13 o superior.
+**Requisitos:** [Node.js](https://nodejs.org) 22.13 o superior y una base de datos PostgreSQL: la de un proyecto de [Supabase](https://supabase.com) (ver [Base de datos en Supabase](#base-de-datos-en-supabase)) o una instalada en el equipo.
 
 ```bash
 git clone https://github.com/cordobapalacionc-dotcom/metodologia.git
@@ -104,27 +105,28 @@ npm start
 
 Luego abrir **http://localhost:3000**.
 
-La base de datos (`backend/datos/quibdo.db`) se crea sola la primera vez, con los cursos, recursos, oportunidades y puntos de ejemplo.
+Antes de `npm start`, definir la variable `DATABASE_URL` con la cadena de conexión, por ejemplo en PowerShell `$env:DATABASE_URL="postgresql://..."` o en Linux/macOS `export DATABASE_URL="postgresql://..."`. Las tablas se crean solas la primera vez, con los cursos, recursos, oportunidades y puntos de ejemplo.
 
 | Comando (dentro de `backend/`) | Descripción |
 |---|---|
 | `npm start` | Inicia el servidor. |
 | `npm run dev` | Inicia el servidor y lo reinicia al guardar cambios. |
 | `npm run admin -- correo@ejemplo.com` | Convierte en administrador a un usuario ya registrado. |
-| `npm run copia` | Crea una copia de seguridad ahora (funciona con el servidor encendido). |
-| `npm run restaurar` | Lista las copias. Con `-- archivo.db` restaura una (con el servidor apagado). |
+| `npm run copia` | Crea una copia de seguridad ahora y la guarda también como archivo `.json`. |
+| `npm run restaurar` | Lista las copias. Con `-- nombre` o `-- archivo.json` restaura una. |
+| `npm run migrar` | Pasa los datos de la base SQLite anterior (`backend/datos/quibdo.db`) a PostgreSQL. |
 
 Variables de entorno opcionales:
 
 | Variable | Por defecto | Uso |
 |---|---|---|
 | `PORT` | `3000` | Puerto del servidor. |
-| `RUTA_DB` | `backend/datos/quibdo.db` | Ubicación del archivo de base de datos. |
+| `DATABASE_URL` | — | **Obligatoria.** Cadena de conexión de PostgreSQL (Supabase). |
+| `RUTA_DB` | `backend/datos/quibdo.db` | Base SQLite anterior; solo la usa `npm run migrar`. |
 | `NODE_ENV` | — | Con `production`, la cookie de sesión solo viaja por HTTPS. |
 | `ADMIN_CORREOS` | — | Correos (separados por comas) que quedan como administradores. |
 | `TRUST_PROXY` | — | Con `1`, usa la IP real detrás de un proxy (en Render se activa sola). |
 | `URL_PUBLICA` | — | Dirección pública del sitio (p. ej. `https://quibdoconecta.co`). Es la que lleva el QR de los certificados. **Recomendada en producción**; si falta, se usa la dirección con la que se abrió el sitio. |
-| `RUTA_COPIAS` | `backend/datos/copias` | Carpeta de las copias de seguridad. Mejor en otro disco que la base de datos. |
 | `HORAS_ENTRE_COPIAS` | `24` | Cada cuántas horas se hace una copia automática. |
 | `COPIAS_MAX` | `30` | Cuántas copias se conservan; las más antiguas se borran. |
 
@@ -134,11 +136,35 @@ El repositorio incluye un Blueprint (`render.yaml`) que crea un servicio web con
 
 1. Abrir: **https://dashboard.render.com/blueprint/new?repo=https://github.com/cordobapalacionc-dotcom/metodologia**
 2. Conectar la cuenta de GitHub si Render lo pide.
-3. Escribir en `ADMIN_CORREOS` el correo de la persona administradora (varios, separados por comas).
+3. Escribir en `ADMIN_CORREOS` el correo de la persona administradora (varios, separados por comas) y en `DATABASE_URL` la cadena de conexión de Supabase.
 4. Pulsar **Apply**. Al terminar, la plataforma queda en `https://quibdo-conecta.onrender.com` (o un nombre parecido).
 5. Registrarse con ese correo: la cuenta queda como administradora de una vez (no hace falta terminal).
 
-> **Ojo con el plan gratuito:** el disco es temporal, así que la base SQLite se borra en cada despliegue o reinicio, y el servicio se duerme tras 15 minutos sin visitas (la primera carga tarda ~1 minuto). Para conservar los datos, usar un plan de pago y activar el disco persistente que está comentado en `render.yaml`.
+> **Plan gratuito de Render:** el servicio se duerme tras 15 minutos sin visitas (la primera carga tarda ~1 minuto). Los datos **no** se pierden, porque viven en Supabase. Sin `DATABASE_URL` el servidor no arranca.
+
+## Base de datos en Supabase
+
+1. Crear una cuenta en [supabase.com](https://supabase.com) y un proyecto nuevo (**New project**). Elegir una región cercana (p. ej. *East US*) y **guardar la contraseña** de la base de datos.
+2. En el proyecto, pulsar **Connect** (arriba) y copiar la cadena de la sección **Session pooler**. Se ve así:
+   `postgresql://postgres.abcdefgh:[YOUR-PASSWORD]@aws-0-us-east-1.pooler.supabase.com:5432/postgres`
+3. Reemplazar `[YOUR-PASSWORD]` por la contraseña del paso 1. Esa es la `DATABASE_URL`.
+   Usar el **Session pooler** y no la conexión directa: la directa solo funciona con IPv6 y Render usa IPv4.
+4. En Render: servicio **quibdo-conecta → Environment → Add Environment Variable**, clave `DATABASE_URL`, pegar el valor y guardar. Render vuelve a publicar el sitio.
+5. Al arrancar, el servidor crea las tablas y el contenido de ejemplo. Se pueden ver en Supabase, en **Table Editor**.
+
+**Pasar los datos de la versión anterior (SQLite).** Si ya se usó la plataforma con SQLite en un computador (por ejemplo, para conservar la cuenta de administrador), en ese computador, dentro de `backend/`:
+
+```bash
+npm install
+```
+
+y luego, con la misma `DATABASE_URL`:
+
+```bash
+npm run migrar
+```
+
+Pasa usuarios (con sus contraseñas), avance, certificados, diagnósticos, puntos, cursos, recursos y oportunidades. Si la base de Supabase ya tiene usuarios, el comando se detiene; para reemplazarlo todo se agrega `-- --reemplazar` (antes guarda una copia de lo que había).
 
 ## Primer administrador
 
@@ -175,9 +201,9 @@ El código sirve **una sola vez**, vence en **24 horas** y se anula después de 
 
 - **Automáticas:** al encender el servidor y cada hora se revisa si la última copia tiene más de 24 horas; si es así, se hace una nueva. Se guardan las 30 más recientes.
 - **Manuales:** en **Admin → Copias de seguridad → Crear copia ahora**, o con `npm run copia`.
-- Se hacen con `VACUUM INTO` de SQLite, así que la copia es consistente aunque haya gente usando la plataforma.
-- **Restaurar:** detener el servidor y, dentro de `backend/`, ejecutar `npm run restaurar -- quibdo-AAAAMMDD-HHMMSS.db`. El comando comprueba que el servidor esté apagado y que la copia no esté dañada, y **guarda la base actual antes de reemplazarla**, así que la restauración se puede deshacer.
-- Las copias contienen datos personales: solo los administradores pueden descargarlas. Las copias quedan en el mismo equipo que la plataforma; para no perderlo todo si el equipo falla, guarda de vez en cuando una copia en otro lugar.
+- Cada copia es una fotografía en JSON de todas las tablas (menos las sesiones), guardada en la misma base de datos, en la tabla `copias`. Se descarga como archivo `.json`.
+- **Restaurar:** dentro de `backend/`, con la `DATABASE_URL` definida, ejecutar `npm run restaurar -- quibdo-AAAAMMDD-HHMMSS.json` (una copia guardada en la base) o `npm run restaurar -- ruta/archivo.json` (una copia descargada). Reemplaza **todos** los datos, pero antes **guarda una copia del estado actual**, así que se puede deshacer.
+- Las copias contienen datos personales: solo los administradores pueden descargarlas. Como quedan en la misma base de datos, sirven para deshacer errores; para no perderlo todo si se pierde el proyecto de Supabase, descarga de vez en cuando una copia y guárdala en otro lugar.
 
 ## Estructura del proyecto
 
@@ -187,7 +213,8 @@ metodologia/
 │   ├── src/
 │   │   ├── server.js          # Servidor Express: API, archivos del frontend y cabeceras de seguridad
 │   │   ├── config.js          # Puerto, base de datos, URL pública, copias
-│   │   ├── db.js              # Tablas SQLite y migraciones
+│   │   ├── db.js              # Conexión a PostgreSQL, transacciones y arranque
+│   │   ├── esquema.sql        # Tablas de la base de datos
 │   │   ├── semilla.js         # Contenido inicial
 │   │   ├── autenticacion.js   # Contraseñas (scrypt) y sesiones (cookie HttpOnly)
 │   │   ├── utilidades.js      # Validaciones, límites de intentos, conversión de texto a HTML seguro
@@ -197,7 +224,7 @@ metodologia/
 │   │   └── rutas/             # Un archivo por sección de la API
 │   │       ├── auth.js  cursos.js  puntos.js  recursos.js  oportunidades.js
 │   │       └── diagnosticos.js  certificados.js  perfil.js  admin.js  facilitador.js
-│   └── scripts/               # crear-admin.js  copia.js  restaurar.js
+│   └── scripts/               # crear-admin.js  copia.js  restaurar.js  migrar-desde-sqlite.js
 └── frontend/
     ├── index.html             # Iniciar sesión / registrarse
     ├── inicio.html  aula.html  conectividad.html  recursos.html
@@ -278,7 +305,7 @@ La plataforma está pensada para conexiones intermitentes:
 - Validación de todos los datos en el servidor.
 - Las respuestas correctas de las lecciones nunca se envían al navegador.
 - El contenido que escriben los administradores se convierte a HTML **escapando** todo, para evitar inyección de código.
-- La base de datos (`backend/datos/`) está en `.gitignore`: **no se sube al repositorio**.
+- La cadena de conexión (`DATABASE_URL`) contiene la contraseña de la base de datos: va solo en las variables de entorno, **nunca en el repositorio**. La base SQLite anterior (`backend/datos/`) sigue en `.gitignore`.
 
 ## Limitaciones del prototipo
 
