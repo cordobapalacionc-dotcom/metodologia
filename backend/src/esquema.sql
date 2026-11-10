@@ -165,3 +165,16 @@ CREATE TABLE IF NOT EXISTS copias (
   manual  BOOLEAN NOT NULL DEFAULT FALSE,
   datos   TEXT NOT NULL
 );
+
+-- Supabase publica las tablas del esquema "public" por su API web (PostgREST).
+-- Con RLS activado y sin políticas, esa API no puede leer ni escribir nada;
+-- el servidor de la plataforma se conecta como "postgres", que no está sujeto a RLS.
+DO $$
+DECLARE t text;
+BEGIN
+  FOREACH t IN ARRAY ARRAY['usuarios','sesiones','cursos','lecciones','progreso','puntos','recursos','descargas',
+                           'oportunidades','guardadas','diagnosticos','certificados','inscripciones','recuperaciones','copias']
+  LOOP
+    EXECUTE format('ALTER TABLE %I ENABLE ROW LEVEL SECURITY', t);
+  END LOOP;
+END $$;
