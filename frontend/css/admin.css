@@ -19,7 +19,7 @@
 .lista-admin{display:grid;gap:10px}
 .fila-admin{display:flex;gap:14px;align-items:flex-start;background:#fff;border:1px solid var(--borde);border-radius:12px;padding:12px 14px}
 .fila-admin.pendiente{border-left:4px solid var(--oro)}
-.fila-admin .info{flex:1;min-width:0}
+.fila-admin .info{flex:1;min-width:0;overflow-wrap:anywhere}
 .fila-admin .info b{display:block}
 .fila-admin .info small{color:var(--suave);display:block}
 .fila-admin .acciones{flex:0 0 auto}
@@ -50,6 +50,10 @@ textarea{min-height:180px;resize:vertical;font-family:inherit}
 
 @media (max-width:640px){
   .fila-admin{flex-direction:column}
+  /* Pestañas en una sola fila que se desliza con el dedo */
+  .tabs-admin{flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none;gap:0;margin-left:-16px;margin-right:-16px;padding:0 16px}
+  .tabs-admin::-webkit-scrollbar{display:none}
+  .tabs-admin button{flex:none;white-space:nowrap;padding:10px 12px}
 }
 
 /* =========================================================
@@ -87,7 +91,7 @@ code{font-family:ui-monospace,Consolas,monospace;background:#eef3ee;padding:1px 
 .subtitulo-impacto{display:flex;gap:8px;align-items:center;color:var(--selva);margin:8px 0 10px}
 
 /* Columnas por mes: una serie por gráfica, cada una con su propia escala */
-.grid-meses{display:grid;gap:12px;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));margin-bottom:16px}
+.grid-meses{display:grid;gap:12px;grid-template-columns:repeat(auto-fill,minmax(min(240px,100%),1fr));margin-bottom:16px}
 .grafica-meses{margin:0}
 .grafica-meses figcaption{display:flex;justify-content:space-between;align-items:baseline;gap:8px;margin-bottom:10px}
 .grafica-meses figcaption span{color:var(--suave);font-size:.8rem}
@@ -108,7 +112,7 @@ code{font-family:ui-monospace,Consolas,monospace;background:#eef3ee;padding:1px 
 .tabla-mini th,.tabla-mini td{padding:4px 8px}
 
 /* Barras horizontales con el valor escrito */
-.grid-impacto{display:grid;gap:12px;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));margin-bottom:12px}
+.grid-impacto{display:grid;gap:12px;grid-template-columns:repeat(auto-fit,minmax(min(320px,100%),1fr));margin-bottom:12px}
 .bloque-impacto{margin-bottom:12px}
 .grid-impacto .bloque-impacto{margin-bottom:0}
 .bloque-impacto h3{color:var(--selva)}
