@@ -11,6 +11,19 @@
 .auth-lado li{display:flex;gap:12px;align-items:center}
 .auth-lado li .ico{color:var(--oro);width:22px;height:22px}
 
+/* Objetivos del proyecto (columna izquierda) */
+.objetivos{background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.18);border-radius:14px;padding:14px 18px;max-width:560px}
+.objetivos summary{cursor:pointer;font-weight:700;display:flex;gap:8px;align-items:center;list-style:none}
+.objetivos summary::-webkit-details-marker{display:none}
+.objetivos summary::after{content:"▾";margin-left:auto;transition:transform .2s}
+.objetivos[open] summary::after{transform:rotate(180deg)}
+.objetivos summary .ico{color:var(--oro);width:20px;height:20px}
+.objetivos h2{font-size:.95rem;margin:14px 0 6px;color:var(--oro)}
+.objetivos p,.objetivos li{font-size:.86rem;line-height:1.45;opacity:.95}
+.objetivos p{max-width:none}
+.objetivos ol{margin:0;padding-left:20px;display:grid;gap:6px}
+.objetivos li{display:list-item}
+
 .auth-form{display:flex;align-items:center;justify-content:center;padding:32px 20px}
 .auth-caja{width:100%;max-width:410px}
 .auth-tabs{display:grid;grid-template-columns:1fr 1fr;background:#e8ede6;border-radius:12px;padding:4px;margin-bottom:22px}
@@ -39,5 +52,6 @@
   .auth-lado{padding:26px 22px;gap:10px}
   .auth-lado h1{font-size:1.6rem}
   .auth-lado ul{display:none}
+  .objetivos{padding:10px 14px;margin-top:6px}
 }
 @media (max-width:480px){ .fila-2{grid-template-columns:1fr} }
