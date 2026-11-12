@@ -5,6 +5,9 @@ import { $, $$, ico, esc, obtenerUsuario, recordarUsuario, registrarServiceWorke
 registrarServiceWorker();
 
 /** Adónde ir después de entrar: si llegó con una invitación a un curso, al aula para unirse. */
+// Objetivos del proyecto: abiertos en computador, plegados en celular para no tapar el formulario
+$('#objetivos').open = matchMedia('(min-width: 861px)').matches;
+
 const params = new URLSearchParams(location.search);
 const destino = () => params.get('unirse') ? `/aula?unirse=${encodeURIComponent(params.get('unirse'))}` : '/inicio';
 
