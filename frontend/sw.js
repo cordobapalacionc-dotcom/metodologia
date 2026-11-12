@@ -5,7 +5,7 @@
  * - Mapa: las teselas de OpenStreetMap que ya se vieron se guardan (máx. MAX_TESELAS).
  * Cambia VERSION cada vez que publiques cambios en el frontend.
  */
-const VERSION = 'qc-v5';
+const VERSION = 'qc-v6';
 const CACHE_ESTATICO = `${VERSION}-estatico`;
 const CACHE_API = 'qc-api';
 const CACHE_MAPA = 'qc-mapa';
